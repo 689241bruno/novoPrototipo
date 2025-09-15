@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import UsuarioService from "../../services/UsuarioService"; 
 import { TextInput } from "react-native-paper";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -16,7 +17,7 @@ export default function Signin() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const cadastrarUsuario = () => {
+  const cadastrarUsuario = async () => {
     const emailLimpo = email.trim().toLowerCase();
     const senhaLimpa = senha.trim();
     const nomeLimpo = nome.trim();
@@ -30,25 +31,21 @@ export default function Signin() {
       alert("Email inválido.");
       return;
     }
-    axios
-      // API publicada no Railway - Banco de dados do Neon
-      .post("https://api-postgre-lk9v.onrender.com/usuarios", {
-        nome: nomeLimpo,
-        email: emailLimpo,
-        senha: senhaLimpa,
-      })
-      .then((response) => {
-        console.log(response.data);
-        setNome("");
-        setEmail("");
-        setSenha("");
-        alert("Usuário Cadastrado!");
-        navigation.navigate("Login");
-      })
-      .catch((error) => {
-        console.error("Erro na API:", error);
-        alert("Algo deu erado!");
-      });
+
+    
+    try {
+      const response = await UsuarioService.cadastrarUsuario( nomeLimpo, emailLimpo, senhaLimpa );
+      console.log(response.data);
+      setNome("");
+      setEmail("");
+      setSenha("");
+      alert("Usuário Cadastrado!");
+      navigation.navigate("Login");
+    } catch (error) {
+      console.error("Erro na API: ", error);
+      alert("Algo deu errado!")
+    }
+  
   };
 
   return (

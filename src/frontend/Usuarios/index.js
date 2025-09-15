@@ -11,10 +11,11 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 
+
 import axios from "axios";
 
 export default function Usuarios() {
-  const [usuarios, setUsuarios] = useState("");
+  const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function Usuarios() {
   const buscarUsuarios = async () => {
     try {
       const resposta = await axios.get(
-        "https://apipostgresql-production.up.railway.app/"
+        "https://localhost:3000/usuarios"
       );
 
       setUsuarios(resposta.data);
@@ -53,7 +54,7 @@ export default function Usuarios() {
           <Text style={(styles.cell, styles.header)}>Nome</Text>
           <Text style={(styles.cell, styles.header)}>Email</Text>
         </View>
-        {usuarios.map((usuario) => (
+        {(usuarios || []).map((usuario) => (
           <View key={usuario.id} style={styles.row}>
             <Text style={styles.cell}>{usuario.nome}</Text>
             <Text style={styles.cell}>{usuario.email}</Text>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import UsuarioService from "../../services/UsuarioService";
 import { TextInput, Checkbox } from "react-native-paper";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -6,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 
-import axios from "axios";
+import axios from 'axios';
 
 export default function Signin() {
   const [checked, setChecked] = React.useState(false);
@@ -15,7 +16,7 @@ export default function Signin() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const loginUsuario = () => {
+  const loginUsuario = async () => {
     const emailLimpo = email.trim().toLowerCase();
     const senhaLimpa = senha.trim();
 
@@ -28,23 +29,26 @@ export default function Signin() {
       alert("Email inválido.");
       return;
     }
-    axios
-      // API publicada no Render (conta -> "anonimodark712") - Banco de dados do Neon
-      .post("https://api-postgre-lk9v.onrender.com/login", {
-        email: emailLimpo,
-        senha: senhaLimpa,
-      })
-      .then((response) => {
-        console.log(response.data);
-        setEmail("");
-        setSenha("");
-        alert("Usuário logado!");
-        navigation.navigate("Principal");
-      })
-      .catch((error) => {
-        console.error("Erro na API:", error);
-        alert("Algo deu erado!");
-      });
+
+    
+    try {
+      const response = await UsuarioService.loginUsuario( emailLimpo, senhaLimpa );
+      console.log(response.data);
+      setEmail("");
+      setSenha("");
+      alert("Usuário logado!");
+      navigation.navigate("Principal");
+    } catch (error) {
+      console.error("Erro na API: ", error.response?.data || error.message);
+      if ( error.response?.status === 401 ) {
+        alert("Email ou Senha inválidos!");
+      } else if ( error.response?.status === 404 ){
+        alert("Usuário não encontrado!");
+      } else {
+        alert("Erro ao tentar logar. Tente novamente.");
+      }
+    }
+     
   };
 
   return (
@@ -58,7 +62,10 @@ export default function Signin() {
         delay={100}
         style={styles.header}
       >
-        <TouchableOpacity style={styles.botaoVoltar}>
+        <TouchableOpacity 
+          style={styles.botaoVoltar}
+          onPress={() => navigation.navigate("Inicial")}
+        >
           <Text style={{ textAlign: "center" }}>
             <MaterialIcons name="arrow-back" size={40} color="black" />
           </Text>

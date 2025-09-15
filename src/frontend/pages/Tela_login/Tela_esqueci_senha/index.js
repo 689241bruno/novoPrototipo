@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 
-import axios from "axios";
+import UsuarioService from "../../../services/UsuarioService";
 
 export default function Signin() {
   const navigation = useNavigation();
@@ -23,10 +23,15 @@ export default function Signin() {
     if (!emailLimpo.includes("@") || !emailLimpo.includes(".")) {
       alert("Email inválido.");
       return;
-    } else {
+    } 
+
+    try {
+      UsuarioService.recuperarSenha(emailLimpo);
       alert("Código enviado!");
       navigation.navigate("CodigoVerificacao");
-      return;
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao enviar código! Tente novamente.")
     }
   };
 

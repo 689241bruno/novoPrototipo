@@ -75,12 +75,16 @@ export default function Home() {
       </Animatable.View>
 
       <ScrollView style={styles.main}>
-        <ContainerMateria
-          titulo="Linguagens"
-          progress={0.7}
-          nomeImage="Linguagens"
-          delayanim={400}
-        />
+        <Pressable 
+          onPress={() => navigation.navigate("Linguagens", { materia: "Linguagens" })}
+        >
+          <ContainerMateria
+            titulo="Linguagens"
+            progress={0.7}
+            nomeImage="Linguagens"
+            delayanim={400}
+          />
+        </Pressable>  
         <ContainerMateria
           titulo="Matemática"
           progress={0.5}
