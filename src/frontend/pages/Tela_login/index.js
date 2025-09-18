@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 
-import axios from 'axios';
+import axios from "axios";
 
 export default function Signin() {
   const [checked, setChecked] = React.useState(false);
@@ -30,9 +30,11 @@ export default function Signin() {
       return;
     }
 
-    
     try {
-      const response = await UsuarioService.loginUsuario( emailLimpo, senhaLimpa );
+      const response = await UsuarioService.loginUsuario(
+        emailLimpo,
+        senhaLimpa
+      );
       console.log(response.data);
       setEmail("");
       setSenha("");
@@ -40,15 +42,14 @@ export default function Signin() {
       navigation.navigate("Principal");
     } catch (error) {
       console.error("Erro na API: ", error.response?.data || error.message);
-      if ( error.response?.status === 401 ) {
+      if (error.response?.status === 401) {
         alert("Email ou Senha inválidos!");
-      } else if ( error.response?.status === 404 ){
+      } else if (error.response?.status === 404) {
         alert("Usuário não encontrado!");
       } else {
         alert("Erro ao tentar logar. Tente novamente.");
       }
     }
-     
   };
 
   return (
@@ -62,7 +63,7 @@ export default function Signin() {
         delay={100}
         style={styles.header}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.botaoVoltar}
           onPress={() => navigation.navigate("Inicial")}
         >

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import UsuarioService from "../../services/UsuarioService"; 
+import UsuarioService from "../../services/UsuarioService";
 import { TextInput } from "react-native-paper";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -32,9 +32,12 @@ export default function Signin() {
       return;
     }
 
-    
     try {
-      const response = await UsuarioService.cadastrarUsuario( nomeLimpo, emailLimpo, senhaLimpa );
+      const response = await UsuarioService.cadastrarUsuario(
+        nomeLimpo,
+        emailLimpo,
+        senhaLimpa
+      );
       console.log(response.data);
       setNome("");
       setEmail("");
@@ -43,9 +46,8 @@ export default function Signin() {
       navigation.navigate("Login");
     } catch (error) {
       console.error("Erro na API: ", error);
-      alert("Algo deu errado!")
+      alert("Algo deu errado!");
     }
-  
   };
 
   return (
