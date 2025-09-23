@@ -8,7 +8,7 @@ exports.listarMaterias = async (req, res) => {
 
     try {
         const [materiaisRows] = await pool.query(
-            "SELECT * FROM materias WHERE materia = ?",
+            "SELECT * FROM material WHERE materia = ?",
             [materia]
         );
 
@@ -44,7 +44,7 @@ exports.publicarMateria = async (req, res) => {
 
     try {
         const [result] = await pool.query(
-            "INSERT INTO materias (materia, tema, titulo, arquivo, criado_por) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO material (materia, tema, titulo, arquivo, criado_por) VALUES (?, ?, ?, ?, ?)",
             [materia, tema, titulo, arquivo, idProfessor]
         );
         res.json({ sucesso: true, id: result.insertId });
@@ -58,25 +58,25 @@ exports.publicarMateria = async (req, res) => {
 exports.atualizarProgresso = async (req, res) => {
     const { idUsuario, atividadeId, progresso, titulo, tema } = req.body;
 
-    if (!idUsuario || !atividadeId || progresso === undefined || !titulo || !tema || !materia) {
-        return res.status(400).json({ erro: "Todos os campos são obrigatórios!" });
+    if (!idUsuario || !atividadeId || progresso === undefined) {
+        return res.status(400).json({ erro: "Campos obrigatórios ausentes!" });
     }
 
     try {
         const [existing] = await pool.query(
-            "SELECT * FROM progresso_atividades WHERE id_usuario=? AND atividade_id=?",
+            "SELECT * FROM progresso_atividades WHERE usuario_id=? AND atividade_id=?",
             [idUsuario, atividadeId]
         );
 
         if (existing.length > 0) {
             await pool.query(
-                "UPDATE progresso_atividades SET progresso=? WHERE id_usuario=? AND atividade_id=?",
+                "UPDATE progresso_atividades SET progresso=? WHERE usuario_id=? AND atividade_id=?",
                 [progresso, idUsuario, atividadeId]
             );
         } else {
             await pool.query(
-                "INSERT INTO progresso_atividades (id_usuario, materia, titulo, tema, atividade_id, progresso) VALUES (?, ?, ?, ?, ?)",
-                [idUsuario, materia, titulo, tema, atividadeId, progresso]
+                "INSERT INTO progresso_atividades (usuario_id, titulo, tema, atividade_id, progresso) VALUES (?, ?, ?, ?, ?)",
+                [idUsuario, titulo, tema, atividadeId, progresso]
             );
         }
 

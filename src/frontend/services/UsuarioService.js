@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://192.168.0.185:3000"; // se for rodar no navegador -> http://localhost:3000
+const API_URL = "http:/localhost:3000"; // se for rodar no navegador -> http://localhost:3000
 
 class UsuarioService {
   // Usuario
-  static async cadastrarUsuario(nome, email, senha, tipo) {
-    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, tipo });
+  static async cadastrarUsuario(nome, email, senha, isAluno = 1, isProfessor = 0, isAdmin = 0) {
+    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, isAluno, isProfessor, isAdmin });
   }
 
   static async loginUsuario(email, senha) {
@@ -17,23 +17,23 @@ class UsuarioService {
   }
 
   static async editarUsuario(id, dados) {
-    return axios.editar(`${API_URL}/editusuario`, { id, dados });
+    return axios.put(`${API_URL}/editusuario`, { id, dados });
   }
 
   static async deletarUsuario(id) {
-    return axios.delete(`${API_URL}/delusuario`, { id });
+    return axios.delete(`${API_URL}/delusuario`, { data: { id }});
   }
 
   static async verificarTipo(email) {
-    return axios.post(`${API_URL}/verificar-tipo`, { email });
+    return axios.get(`${API_URL}/verificar-tipo`, { params: { email } });
   }
 
   static async checkUser(email) {
-    return axios.post(`${API_URL}/check-user`, { email });
+    return axios.get(`${API_URL}/check-user`, { params: { email } });
   }
 
   static async checkUserPass(email, senha) {
-    return axios.post(`${API_URL}/check-user-pass`, { email, senha });
+    return axios.get(`${API_URL}/check-user-pass`, { params: { email, senha } });
   }
 
   static async enviarRedacao(redacao) {

@@ -8,7 +8,9 @@ class Usuario {
     senha,
     isAluno = false,
     isProfessor = false,
-    isAdmin = false
+    isAdmin = false,
+    foto, 
+    criado_em
   ) {
     this.id = id;
     this.nome = nome;
@@ -17,6 +19,8 @@ class Usuario {
     this.isAluno = isAluno;
     this.isProfessor = isProfessor;
     this.isAdmin = isAdmin;
+    this.foto = foto;
+    this.criado_em = criado_em;
   }
 
   async listar() {

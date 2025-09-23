@@ -1,7 +1,10 @@
+CREATE DATABASE IF NOT EXISTS macawdemy;
+USE macawdemy;
+
 CREATE TABLE IF NOT EXISTS usuarios (
 id INT AUTO_INCREMENT PRIMARY KEY,
 nome VARCHAR(255) NOT NULL, 
-email VARCHAR(255) NOT NULL, 
+email VARCHAR(255) NOT NULL UNIQUE, 
 senha VARCHAR(255) NOT NULL, 
 is_aluno TINYINT(1) NOT NULL DEFAULT 0, 
 is_professor TINYINT(1) NOT NULL DEFAULT 0, 
@@ -42,7 +45,7 @@ id INT AUTO_INCREMENT PRIMARY KEY,
 titulo VARCHAR(255),
 tema VARCHAR(255),
 materia VARCHAR(255),
-titulo LONGBLOB NOT NULL,
+arquivo LONGBLOB NOT NULL,
 criado_por INT NOT NULL,
 FOREIGN KEY (criado_por) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
@@ -55,8 +58,8 @@ tema VARCHAR(255),
 atividade_id INT NOT NULL,
 progresso TINYINT DEFAULT 0 CHECK (progresso BETWEEN 0 AND 100),
 atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL,
-FOREIGN KEY (atividade_id) REFERENCES material(id) ON DELETE SET NULL
+FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+FOREIGN KEY (atividade_id) REFERENCES material(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS notificacoes(
@@ -94,8 +97,9 @@ comp4 INT,
 comp5 INT,
 nota_ia INT, 
 nota_professor INT,
-corrigida_por_professor TINYINT(1) DEFAULT 0 NOT NULL,
+corrigida_por_professor INT, 
 corrigida  TINYINT(1) DEFAULT 0 NOT NULL,
+FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
 FOREIGN KEY (corrigida_por_professor) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
@@ -110,7 +114,7 @@ FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 
 CREATE TABLE IF NOT EXISTS simulados(
 id INT AUTO_INCREMENT PRIMARY KEY,
-feito_por INT NOT NULL,
+feito_por INT,
 data DATE,
 pontuacao INT,
 FOREIGN KEY (feito_por) REFERENCES usuarios(id) ON DELETE SET NULL
