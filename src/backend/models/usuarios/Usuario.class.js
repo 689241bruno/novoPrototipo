@@ -9,7 +9,7 @@ class Usuario {
     isAluno = false,
     isProfessor = false,
     isAdmin = false,
-    foto, 
+    foto,
     criado_em
   ) {
     this.id = id;
@@ -23,7 +23,7 @@ class Usuario {
     this.criado_em = criado_em;
   }
 
-  async listar() {
+  static async listar() {
     const [rows] = await pool.query("SELECT * FROM usuarios");
     return rows;
   }

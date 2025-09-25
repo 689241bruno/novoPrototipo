@@ -1,11 +1,25 @@
 import axios from "axios";
 
-const API_URL = "http:/localhost:3000"; // se for rodar no navegador -> http://localhost:3000
+const API_URL = "http://192.168.0.185:3000"; // se for rodar no navegador -> http://localhost:3000
 
 class UsuarioService {
   // Usuario
-  static async cadastrarUsuario(nome, email, senha, isAluno = 1, isProfessor = 0, isAdmin = 0) {
-    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, isAluno, isProfessor, isAdmin });
+  static async cadastrarUsuario(
+    nome,
+    email,
+    senha,
+    isAluno = 1,
+    isProfessor = 0,
+    isAdmin = 0
+  ) {
+    return axios.post(`${API_URL}/cadusuario`, {
+      nome,
+      email,
+      senha,
+      isAluno,
+      isProfessor,
+      isAdmin,
+    });
   }
 
   static async loginUsuario(email, senha) {
@@ -21,7 +35,7 @@ class UsuarioService {
   }
 
   static async deletarUsuario(id) {
-    return axios.delete(`${API_URL}/delusuario`, { data: { id }});
+    return axios.delete(`${API_URL}/delusuario`, { data: { id } });
   }
 
   static async verificarTipo(email) {
@@ -33,7 +47,9 @@ class UsuarioService {
   }
 
   static async checkUserPass(email, senha) {
-    return axios.get(`${API_URL}/check-user-pass`, { params: { email, senha } });
+    return axios.get(`${API_URL}/check-user-pass`, {
+      params: { email, senha },
+    });
   }
 
   static async enviarRedacao(redacao) {
