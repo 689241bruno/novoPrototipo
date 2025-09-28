@@ -1,4 +1,5 @@
 import React from "react";
+import MainTabNavigator from "../../components/NavBar";
 import {
   Text,
   View,
@@ -29,7 +30,10 @@ export default function Home() {
         animation={"fadeInDown"}
         style={styles.header}
       >
-        <Pressable style={styles.botao}>
+        <Pressable
+          style={styles.botao}
+          onPress={() => navigation.navigate("Ranking")}
+        >
           <Image
             source={require("../../assets/trophy.png")}
             style={{ height: "80%", width: "80%" }}
@@ -75,8 +79,10 @@ export default function Home() {
       </Animatable.View>
 
       <ScrollView style={styles.main}>
-        <Pressable 
-          onPress={() => navigation.navigate("Linguagens", { materia: "Linguagens" })}
+        <Pressable
+          onPress={() =>
+            navigation.navigate("Linguagens", { materia: "Linguagens" })
+          }
         >
           <ContainerMateria
             titulo="Linguagens"
@@ -84,7 +90,7 @@ export default function Home() {
             nomeImage="Linguagens"
             delayanim={400}
           />
-        </Pressable>  
+        </Pressable>
         <ContainerMateria
           titulo="Matemática"
           progress={0.5}
@@ -106,7 +112,7 @@ export default function Home() {
         <ContainerMateria titulo="Redação" progress={0.4} nomeImage="Redação" />
         <View style={styles.footer}></View>
       </ScrollView>
-      <MenuBar></MenuBar>
+      <MenuBar />
     </SafeAreaView>
   );
 }
@@ -118,7 +124,7 @@ const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    marginTop: 10,
+    marginTop: 20,
     height: 60,
     backgroundColor: "#FFF",
     flexDirection: "row",

@@ -9,6 +9,7 @@ import TelaTeste from "../Testes_de_componentes/index.js";
 import EsqueciSenha from "../pages/Tela_login/Tela_esqueci_senha/index.js";
 import CodigoVerificacao from "../pages/Tela_login/Tela_esqueci_senha/Tela_codigo_verificacao/index.js";
 import Linguagens from "../pages/materias/Tela_Linguagens/index.js";
+import Ranking from "../pages/Tela_ranking/index.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +68,12 @@ export default function Routes() {
       <Stack.Screen
         name="Linguagens"
         component={Linguagens}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="Ranking"
+        component={Ranking}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
