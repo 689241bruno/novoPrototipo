@@ -61,3 +61,5 @@ VALUES (
     1
 );
 
+INSERT INTO `usuarios` (nome, email, senha, is_aluno, is_professor, is_admin) VALUES ('Miguel', 'mg@gmail.com', '1234', 0, 1, 0);
+

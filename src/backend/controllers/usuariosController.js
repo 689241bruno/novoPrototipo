@@ -13,12 +13,18 @@ exports.listarUsuarios = async (req, res) => {
 
 // Cria um novo usuário 
 exports.criarUsuario = async (req, res) => {
-    const { nome, email, senha, tipo } = req.body;
+    console.log("Dados recebidos no cadastro:", req.body); 
+
+    const { nome, email, senha, is_aluno, is_professor, is_admin } = req.body;
     try { 
-        const novoUsuario = await Usuario.cadastrar(nome, email, senha, tipo);
+        const novoUsuario = await Usuario.cadastrar(nome, email, senha, is_aluno, is_professor, is_admin);
         res.status(201).json(novoUsuario);    
     }  catch (err) {
         console.error("Erro no cadastro: ", err);
+
+        if (err.code === "ER_DUP_ENTRY") {
+        return res.status(400).json({ mensagem: "Este email já está cadastrado!" });
+    }
         res.status(500).json({ mensagem: "Erro ao criar usuário! ", erro: err.message});
     }
 }

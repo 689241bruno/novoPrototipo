@@ -112,7 +112,6 @@ export default function Home() {
         <ContainerMateria titulo="Redação" progress={0.4} nomeImage="Redação" />
         <View style={styles.footer}></View>
       </ScrollView>
-      <MenuBar />
     </SafeAreaView>
   );
 }

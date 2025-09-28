@@ -1,23 +1,65 @@
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import React from "react";
+
+const imagens = {
+  PlanoEstudos: require("../../assets/PlanoEstudos_Icon.png"),
+  Flashcards: require("../../assets/Flashcards_Icon.png"),
+  Home: require("../../assets/Home_Icon.png"),
+  Ranking: require("../../assets/Ranking_Icon.png"),
+  Config: require("../../assets/Config_Icon.png"),
+};
+
 export default function MenuBar() {
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
+        {/* Lado esquerdo */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.botao}></TouchableOpacity>
+          <TouchableOpacity style={styles.botao}>
+            <Image
+              style={styles.icon}
+              source={imagens.PlanoEstudos}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.botao}></TouchableOpacity>
+          <TouchableOpacity style={styles.botao}>
+            <Image
+              style={styles.icon}
+              source={imagens.Flashcards}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
 
+        {/* Botão central */}
         <View style={styles.sectionMeio}>
-          <TouchableOpacity style={styles.botaoMeio}></TouchableOpacity>
+          <TouchableOpacity style={styles.botaoMeio}>
+            <Image
+              style={styles.iconMeio}
+              source={imagens.Home}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
 
+        {/* Lado direito */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.botao}></TouchableOpacity>
+          <TouchableOpacity style={styles.botao}>
+            <Image
+              style={styles.icon}
+              source={imagens.Ranking}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.botao}></TouchableOpacity>
+          <TouchableOpacity style={styles.botao}>
+            <Image
+              style={styles.icon}
+              source={imagens.Config}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -33,11 +75,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     elevation: 5,
   },
-
   nav: {
     height: "100%",
     width: "100%",
-    padding: 10,
     alignItems: "center",
     justifyContent: "space-around",
     flexDirection: "row",
@@ -53,25 +93,36 @@ const styles = StyleSheet.create({
   sectionMeio: {
     height: 90,
     width: 90,
-    borderRadius: "50%",
+    borderRadius: 45,
     marginBottom: 30,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     backgroundColor: "#FFF",
+    elevation: 5,
   },
   botao: {
     height: 55,
     width: 55,
-    backgroundColor: "#d1d1d1",
-    borderRadius: "50%",
     elevation: 5,
+    alignItems: "center",
+    justifyContent: "center",
   },
   botaoMeio: {
     height: 70,
     width: 70,
-    backgroundColor: "#d1d1d1",
-    borderRadius: "50%",
+    backgroundColor: "#f1f1f1ff",
+    borderRadius: 35,
     elevation: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  icon: {
+    height: 40,
+    width: 40,
+  },
+  iconMeio: {
+    height: 50,
+    width: 50,
   },
 });

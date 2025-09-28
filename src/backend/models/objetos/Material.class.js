@@ -1,9 +1,9 @@
 class Material {
     constructor(id, materia, tema, titulo, arquivo, criado_por, progresso) {
         this.id = id;
-        this.materia = materia;
-        this.tema = tema;
         this.titulo = titulo;
+        this.tema = tema;
+        this.materia = materia;
         this.arquivo = arquivo;
         this.criado_por = criado_por;
         this.progresso = progresso;
@@ -18,9 +18,9 @@ class Material {
     static fromDB(row) {
         return new Material(
             row.id,
-            row.materia,
-            row.tema,
             row.titulo,
+            row.tema,
+            row.materia,
             row.arquivo,
             row.criado_por,
             row.progresso || 0

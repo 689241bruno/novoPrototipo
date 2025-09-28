@@ -31,9 +31,7 @@ class Aluno extends Usuario {
     }
 
     checkRanking ( ranking ) {
-        checkRanking() {
-            return this.ranking;
-        }
+            return this.ranking; 
     }
 }
 

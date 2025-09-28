@@ -143,10 +143,10 @@ export default function TelaLinguagens() {
       {/* Header */}
       <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
         <Pressable style={styles.botao}>
-          <Image
-            source={require("../../../assets/Conquests_Icon.png")}
-            style={{ height: 50, width: 50 }}
-          />
+            <Image
+                source={require("../../../assets/Conquests_Icon.png")}
+                style={{ height: 50, width: 50 }}
+            />
         </Pressable>
         <Image source={require("../../../assets/Macawdemy_Letreiro.png")} resizeMode="contain" style={styles.imagehH1} />
         <View style={styles.rightIcons}>

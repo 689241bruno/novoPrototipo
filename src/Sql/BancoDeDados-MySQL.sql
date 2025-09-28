@@ -46,7 +46,7 @@ titulo VARCHAR(255),
 tema VARCHAR(255),
 materia VARCHAR(255),
 arquivo LONGBLOB NOT NULL,
-criado_por INT NOT NULL,
+criado_por INT,
 FOREIGN KEY (criado_por) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 

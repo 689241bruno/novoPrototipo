@@ -45,8 +45,11 @@ export default function Signin() {
       alert("Usuário Cadastrado!");
       navigation.navigate("Login");
     } catch (error) {
-      console.error("Erro na API: ", error);
-      alert("Algo deu errado!");
+      if (err.response && err.response.status === 400) {
+        alert(err.response.data.mensagem);
+      } else {
+        alert("Erro inesperado ao cadastrar usuário!");
+      }
     }
   };
 

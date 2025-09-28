@@ -9,7 +9,14 @@ import TelaTeste from "../Testes_de_componentes/index.js";
 import EsqueciSenha from "../pages/Tela_login/Tela_esqueci_senha/index.js";
 import CodigoVerificacao from "../pages/Tela_login/Tela_esqueci_senha/Tela_codigo_verificacao/index.js";
 import Linguagens from "../pages/materias/Tela_Linguagens/index.js";
+<<<<<<< HEAD
 import Ranking from "../pages/Tela_ranking/index.js";
+=======
+import TelaPDF from "../pages/materias/LeitorPDF/TelaPDF.js";
+import Matematica from "../pages/materias/Tela_Matematica/index.js";
+import CienciasNatureza from "../pages/materias/Tela_CienciasNatureza/index.js";
+import CienciasHumanas from "../pages/materias/Tela_CienciasHumanas/index.js";
+>>>>>>> 0e94cae2afa08e8be536100a73fbca73dcd98811
 
 const Stack = createNativeStackNavigator();
 
@@ -70,10 +77,32 @@ export default function Routes() {
         component={Linguagens}
         options={{ headerShown: false }}
       />
+<<<<<<< HEAD
 
       <Stack.Screen
         name="Ranking"
         component={Ranking}
+=======
+      <Stack.Screen
+        name="Matematica"
+        component={Matematica}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CienciasNatureza"
+        component={CienciasNatureza}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CienciasHumanas"
+        component={CienciasHumanas}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="TelaPDF"
+        component={TelaPDF}
+>>>>>>> 0e94cae2afa08e8be536100a73fbca73dcd98811
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

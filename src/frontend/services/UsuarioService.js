@@ -4,22 +4,8 @@ const API_URL = "http://192.168.0.185:3000"; // se for rodar no navegador -> htt
 
 class UsuarioService {
   // Usuario
-  static async cadastrarUsuario(
-    nome,
-    email,
-    senha,
-    isAluno = 1,
-    isProfessor = 0,
-    isAdmin = 0
-  ) {
-    return axios.post(`${API_URL}/cadusuario`, {
-      nome,
-      email,
-      senha,
-      isAluno,
-      isProfessor,
-      isAdmin,
-    });
+  static async cadastrarUsuario(nome, email, senha, isAluno = 1, isProfessor = 0, isAdmin = 0) {
+    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, isAluno, isProfessor, isAdmin });
   }
 
   static async loginUsuario(email, senha) {
@@ -68,31 +54,17 @@ class UsuarioService {
     });
   }
 
-  static async publicarMateria(titulo, tema, materia, arquivo, idProfessor) {
-    return axios.post(`${API_URL}/materias/publicar`, {
-      titulo,
-      tema,
-      materia,
-      arquivo,
-      idProfessor,
-    });
+  static async publicarMateriaFormData(formData) {
+    return axios.post(`${API_URL}/materias/publicar`, formData);
   }
 
   // Progresso
-  static async atualizarProgresso(
-    idUsuario,
-    atividadeId,
-    titulo,
-    tema,
-    materia,
-    progresso
-  ) {
+  static async atualizarProgresso(idUsuario, atividadeId, titulo, tema, progresso) {
     return axios.post(`${API_URL}/materias/progresso`, {
       idUsuario,
       atividadeId,
       titulo,
       tema,
-      materia,
       progresso,
     });
   }
