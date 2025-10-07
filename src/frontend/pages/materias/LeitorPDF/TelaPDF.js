@@ -13,7 +13,7 @@ import Constants from "expo-constants";
 export default function Atividade() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { arquivoUrl, atividadeId, titulo, tema, usuarioId = 1, totalPaginas = 1 } = route.params;
+    const { arquivoUrl, atividadeId, titulo, tema, usuarioId = 1, } = route.params;
 
     const [paginaAtual, setPaginaAtual] = useState(1); 
     const [progresso, setProgresso] = useState(0);
@@ -56,28 +56,20 @@ export default function Atividade() {
     }, [arquivoUrl]);
 
     useEffect(() => {
-        if (!loading) atualizarProgresso();
-    }, [paginaAtual, loading]);
-
-    const atualizarProgresso = async () => {
-        if (totalPaginas > 0) {
-            const porcentagem = Math.round((paginaAtual / totalPaginas) * 100);
-            setProgresso(porcentagem);
-            try {
-                await UsuarioService.atualizarProgresso(usuarioId, atividadeId, titulo, tema, porcentagem);
-            } catch (err) {
-                console.error("Erro ao salvar progresso: ", err);
+        const marcarConcluida = async () => {
+            if (!loading && usuarioId && atividadeId) {
+                try {
+                    await UsuarioService.atualizarProgresso(usuarioId, atividadeId, titulo, tema, 100);
+                    setProgresso(100);
+                } catch (err) {
+                    console.error("Erro ao marcar atividade concluída: ", err);
+                }
+                
             }
-        }
-    };
+        };
 
-    const avancarPagina = () => {
-        if (paginaAtual < totalPaginas) setPaginaAtual(paginaAtual + 1);
-    };
-
-    const voltarPagina = () => {
-        if (paginaAtual > 1) setPaginaAtual(paginaAtual - 1);
-    };
+        marcarConcluida();
+    }, [paginaAtual, loading]);
 
     if (loading) {
         return (
@@ -127,17 +119,15 @@ export default function Atividade() {
                 </View>
             </Animatable.View>
 
-            <TouchableOpacity style={styles.botaoVoltar} onPress={() => navigation.goBack()}>
-                <MaterialIcons name="arrow-back" size={30} color="black" />
-            </TouchableOpacity>
-
-            {/* Barra de progresso fixa abaixo do header */}
-            <View style={styles.progressBarBackground}>
-                <View style={[styles.progressBarFill, { width: `${progresso}%` }]} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute', top: 90, left: 20, zIndex: 1 }}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <MaterialIcons name="arrow-back" size={30} color="black" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginLeft: 10 }}>{titulo}</Text>
             </View>
 
             {/* PDF */}
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, paddingTop: 50 }}>
                 {Platform.OS === "web" ? (
                     <iframe
                         src={arquivoUrl}
@@ -154,9 +144,6 @@ export default function Atividade() {
                     <Text style={{ textAlign: "center", marginTop: 20 }}>PDF não disponível.</Text>
                 )}
             </View>
-
-            <MenuBar></MenuBar>
-
         </View>
     );
 }

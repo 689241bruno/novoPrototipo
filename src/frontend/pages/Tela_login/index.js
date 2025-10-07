@@ -6,6 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios from "axios";
 
@@ -50,6 +51,8 @@ export default function Signin() {
         alert("Erro ao tentar logar. Tente novamente.");
       }
     }
+
+    await AsyncStorage.setItem('usuarioEmail', emailLimpo);
   };
 
   return (
@@ -150,7 +153,6 @@ export default function Signin() {
                 padding: 10,
               }}
             >
-              ou
             </Text>
             <View style={styles.linha}></View>
           </View>

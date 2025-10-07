@@ -30,52 +30,22 @@ export default function Home() {
         animation={"fadeInDown"}
         style={styles.header}
       >
-        <Pressable
-          style={styles.botao}
-          onPress={() => navigation.navigate("Ranking")}
-        >
+        <Pressable style={styles.botao}>
           <Image
-            source={require("../../assets/trophy.png")}
-            style={{ height: "80%", width: "80%" }}
+            source={require("../../assets/Conquests_Icon.png")}
+            style={{ height: 50, width: 50, marginLeft: 10 }}
           />
         </Pressable>
-        <Pressable
-          style={styles.botao}
-          onPress={() => navigation.navigate("Perfil")}
-        >
-          <Image
-            source={require("../../assets/user.png")}
-            style={{ height: "100%", width: "100%" }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              height: 20,
-              width: 20,
-              bottom: 0,
-              left: 0,
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../../assets/star.png")}
-              style={{ height: 20, width: 20 }}
-            />
-            <Text
-              style={{
-                position: "absolute",
-                fontWeight: "bold",
-                color: "#FFF",
-                alignSelf: "center",
-                fontSize: 8,
-                top: 5,
-              }}
-            >
-              12
-            </Text>
-          </View>
-        </Pressable>
+        <Image source={require("../../assets/Macawdemy_Letreiro.png")} resizeMode="contain" style={styles.imagehH1} />
+        <View style={styles.rightIcons}>
+          <Pressable style={styles.botao} onPress={() => navigation.navigate("Perfil")}>
+            <Image source={require("../../assets/user.png")} style={{ height: "100%", width: "100%" }} />
+            <View style={styles.userBadge}>
+              <Image source={require("../../assets/star.png")} style={{ height: 20, width: 20 }} />
+              <Text style={styles.userBadgeText}>12</Text>
+            </View>
+          </Pressable>
+        </View>
       </Animatable.View>
 
       <ScrollView style={styles.main}>
@@ -91,27 +61,47 @@ export default function Home() {
             delayanim={400}
           />
         </Pressable>
-        <ContainerMateria
-          titulo="Matemática"
-          progress={0.5}
-          nomeImage="Matemática"
-          delayanim={480}
-        />
-        <ContainerMateria
-          titulo="Ciências da Natureza"
-          progress={0.1}
-          nomeImage="CiênciasdaNatureza"
-          delayanim={560}
-        />
-        <ContainerMateria
-          titulo="Ciências Humanas"
-          progress={0.8}
-          nomeImage="CiênciasHumanas"
-          delayanim={640}
-        />
+        <Pressable
+          onPress={() =>
+            navigation.navigate("Matematica", { materia: "Matematica" })
+          }
+        >
+          <ContainerMateria
+            titulo="Matemática"
+            progress={0.5}
+            nomeImage="Matemática"
+            delayanim={480}
+          />
+        </Pressable>
+        <Pressable
+          onPress={() =>
+            navigation.navigate("CienciasNatureza", { materia: "CienciasNatureza" })
+          }
+        >
+          <ContainerMateria
+            titulo="Ciências da Natureza"
+            progress={0.1}
+            nomeImage="CiênciasdaNatureza"
+            delayanim={560}
+          />
+        </Pressable>
+        <Pressable
+          onPress={() =>
+            navigation.navigate("CienciasHumanas", { materia: "CienciasHumanas" })
+          }
+        >
+          <ContainerMateria
+            titulo="Ciências Humanas"
+            progress={0.8}
+            nomeImage="CiênciasHumanas"
+            delayanim={640}
+          />
+        </Pressable>
         <ContainerMateria titulo="Redação" progress={0.4} nomeImage="Redação" />
         <View style={styles.footer}></View>
       </ScrollView>
+
+      <MenuBar></MenuBar>
     </SafeAreaView>
   );
 }
@@ -121,25 +111,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#338BE5",
   },
-  header: {
-    width: "100%",
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#FFF",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    elevation: 5,
-  },
-  botao: {
-    width: 40,
-    height: 40,
-    borderRadius: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 15, paddingVertical: 5, backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
+  botao: { height: 40, width: 40, justifyContent: "center", alignItems: "center" },
   section: {
     width: 100,
     display: "flex",
@@ -150,7 +123,7 @@ const styles = StyleSheet.create({
   },
   main: {
     padding: 30,
-    paddingTop: 60,
+    paddingTop: 30,
     marginBottom: 60,
     display: "flex",
     flexDirection: "column",
@@ -234,4 +207,5 @@ const styles = StyleSheet.create({
   footer: {
     height: 90,
   },
+  imagehH1: { width: 220, height: 80, marginBottom: 10 },
 });

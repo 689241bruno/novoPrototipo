@@ -1,3 +1,5 @@
+const pool = require("../../config/db");
+
 class Material {
     constructor(id, materia, tema, titulo, arquivo, criado_por, progresso) {
         this.id = id;
@@ -6,15 +8,9 @@ class Material {
         this.materia = materia;
         this.arquivo = arquivo;
         this.criado_por = criado_por;
-        this.progresso = progresso;
+        this.concluida = concluida;
     }
 
-    // Atualiza o progresso da atividade
-    atualizarProgresso(novoProgresso) {
-        this.progresso = novoProgresso;
-    }
-
-    // Converte resultado do banco de dados em objeto material
     static fromDB(row) {
         return new Material(
             row.id,
@@ -25,6 +21,63 @@ class Material {
             row.criado_por,
             row.progresso || 0
         );
+    }
+
+    static async listarMaterial(materia) {
+        try {
+            console.log("Listando materiais para: ", materia);
+            const [rows] = await pool.query(
+                "SELECT * FROM material WHERE materia = ?",
+                [materia]
+            );
+
+            const materiais = rows.map(row => ({
+                id: row.id,
+                tema: row.tema,
+                subtema: row.subtema,
+                materia: row.materia,
+                titulo: row.titulo,
+                arquivo: row.arquivo ? row.arquivo.toString("base64") : null,
+                criado_por: row.criado_por
+            }));
+
+            return materiais;
+        } catch (err) {
+            console.error("Erro SQL no listarMaterial:", err);
+            throw err;
+        }    
+    }
+
+    static async atualizarProgresso(idUsuario, atividadeId, concluida) {
+        const [existing] = await pool.query(
+            "SELECT * FROM progresso_atividades WHERE usuario_id=? AND atividade_id=?",
+            [idUsuario, atividadeId]
+        );
+    
+        if (existing.length > 0) {
+            await pool.query(
+                "UPDATE progresso_atividades SET concluida = 1 WHERE usuario_id=? AND atividade_id=?",
+                [idUsuario, atividadeId]
+            );
+        } else {
+            await pool.query(
+                "INSERT INTO progresso_atividades (usuario_id, atividade_id, concluida) VALUES (?, ?, 1)",
+                [idUsuario, atividadeId, concluida]
+            );
+        }
+    }
+
+    static async listarProgresso(idUsuario){
+        const [rows] = await pool.query(
+            "SELECT atividade_id, concluida FROM progresso_atividades WHERE usuario_id=?",
+            [idUsuario]
+        );
+        return rows;
+    }
+
+    static async verPDF(id) {
+        const res = await pool.query("SELECT arquivo FROM material WHERE id = ?", [id]);
+        return res;
     }
 }
 

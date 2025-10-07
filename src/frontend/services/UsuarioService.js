@@ -1,11 +1,22 @@
 import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = "http://192.168.0.185:3000"; // se for rodar no navegador -> http://localhost:3000
+const API_URL = "http://localhost:3000"; // se for rodar no navegador -> http://localhost:3000
 
 class UsuarioService {
   // Usuario
-  static async cadastrarUsuario(nome, email, senha, isAluno = 1, isProfessor = 0, isAdmin = 0) {
-    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, isAluno, isProfessor, isAdmin });
+
+  static async getLoggedInUserEmail() {
+    try {
+      const email = await AsyncStorage.getItem('usuarioEmail');
+      return email;
+    } catch (err) {
+      console.error("Erro ao buscar email do usuário logado: ", err);
+      return null;
+    }
+  }
+  static async cadastrarUsuario(nome, email, senha, is_aluno = 1, is_professor = 0, is_admin = 0) {
+    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, is_aluno, is_professor, is_admin });
   }
 
   static async loginUsuario(email, senha) {
@@ -55,7 +66,9 @@ class UsuarioService {
   }
 
   static async publicarMateriaFormData(formData) {
-    return axios.post(`${API_URL}/materias/publicar`, formData);
+    return axios.post(`${API_URL}/materias/publicar`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   }
 
   // Progresso
@@ -63,17 +76,12 @@ class UsuarioService {
     return axios.post(`${API_URL}/materias/progresso`, {
       idUsuario,
       atividadeId,
-      titulo,
-      tema,
-      progresso,
     });
   }
 
   static async listarProgressoUsuario(idUsuario, materia) {
     return axios.get(
-      `${API_URL}/materias/progresso/${idUsuario}/${encodeURIComponent(
-        materia
-      )}`
+      `${API_URL}/materias/progresso/${idUsuario}`
     );
   }
 }

@@ -7,30 +7,28 @@ class Professor extends Usuario {
         this.materia = '';
     }
 
-    corrigirRedacao( redacao ) {
+    static async corrigirRedacao( redacao ) {
         redacao.corrigidaPorProfessor = true;
         redacao.feedback = "Correção realizada!";
         return redacao;
     }
 
-    async publicarMaterial(materia, tema, titulo, arquivo) {
-        const [result] = await pool.query(
-            "INSERT INTO materias (materia, tema, titulo, arquivo, criado_por) VALUES (?, ?, ?, ?, ?)",
-            [materia, tema, titulo, arquivo, this.id]
+    static async publicarMaterial( tema, subtema, titulo, materia, arquivo, criado_por) {
+        const result = await pool.query(
+            "INSERT INTO material ( tema, subtema, materia, titulo, arquivo, criado_por) VALUES (?, ?, ?, ?, ?, ?)",
+            [ tema, subtema, materia, titulo, arquivo, criado_por]
         );
-        return { sucesso: true, id: result.insertId };
+        return result;
     }
 
-
-
-    editarMaterial( idMaterial, novoArquivo ) {
+    static async editarMaterial( idMaterial, novoArquivo ) {
         await pool.query(
             "UPDATE materias SET arquivo = ? WHERE id = ? AND criado_por = ?",
             [novoArquivo, idMaterial, this.id]
         );
     }
 
-    apagarMaterial( material ) {
+    static async apagarMaterial( material ) {
         await pool.query(
             "DELETE FROM materiais WHERE id = ? AND criado_por = ?",
             [idMaterial, this.id]

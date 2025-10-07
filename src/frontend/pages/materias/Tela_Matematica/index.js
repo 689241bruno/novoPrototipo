@@ -3,7 +3,7 @@ import {
   SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Pressable, Image, 
   LayoutAnimation, UIManager, Platform, ScrollView, Modal, TextInput 
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from 'expo-document-picker';
@@ -19,8 +19,9 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 export default function TelaLinguagens() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { materia } = route.params || { materia: "Linguagens" };
-  const usuarioId = 1;
+  const { materia } = route.params || { materia: "Matemática" };
+  const [isProfessor, setIsProfessor] = useState(false);
+  const [usuarioId, setUsuarioId] = useState(null);
 
   const [materiais, setMateriais] = useState([]);
   const [expandedMaterias, setExpandedMaterias] = useState({});
@@ -29,6 +30,8 @@ export default function TelaLinguagens() {
   const [arquivoPdf, setArquivoPdf] = useState(null);
   const [titulo, setTitulo] = useState("");
   const [tema, setTema] = useState("");
+  const [subtema, setSubtema] = useState("");
+  const [progressoUsuario, setProgressoUsuario] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [materiaSelecionada, setMateriaSelecionada] = useState(materia);
@@ -40,8 +43,75 @@ export default function TelaLinguagens() {
   ]);
 
   useEffect(() => {
-    fetchMateriais();
-  }, [materiaSelecionada]); 
+    const fetchUserData = async () => {
+      try {
+        const email = await UsuarioService.getLoggedInUserEmail();
+        console.log("Email do usuário:", email);
+
+        const responseCheck = await UsuarioService.checkUser(email);
+        const usuarioCheck = responseCheck.data;
+        console.log("Usuário retornado do backend:", JSON.stringify(usuarioCheck, null, 2));
+        if (!usuarioCheck.existe) {
+          console.error("Usuário não encontrado");
+          return;
+        }
+
+        const responseTipo = await UsuarioService.verificarTipo(email);
+        const tipoUsuario = responseTipo.data;
+        console.log("Dados tipo do Usuario: ", tipoUsuario);
+        console.log("ID do usuário recebido:", tipoUsuario?.id);
+        console.log("Keys do objeto:", Object.keys(tipoUsuario));
+        setIsProfessor(tipoUsuario.is_professor === 1);
+
+        const usuarioId = tipoUsuario?.id;
+        if (!usuarioId) {
+          console.warn("UsuarioId não definido, não será possível listar materiais");
+          return;
+        }
+        setUsuarioId(usuarioId);
+
+        const response = await UsuarioService.listarMaterias(materiaSelecionada, usuarioId);
+        setMateriais(response?.data || []);
+
+        const responseProgresso = await UsuarioService.listarProgressoUsuario(usuarioId);
+        console.log("Progresso recebido: ", responseProgresso.data);
+
+        console.log("Progresso bruto recebido do backend:", responseProgresso.data);
+        console.log("Tipo de progresso:", typeof responseProgresso.data);
+        console.log("É array?", Array.isArray(responseProgresso.data));
+        console.log("Chaves do objeto progresso:", Object.keys(responseProgresso.data || {}));
+
+        const progressoData = normalizarProgresso(responseProgresso.data);
+
+        console.log("Progresso final armazenado no estado:", progressoData);
+        setProgressoUsuario(progressoData);
+      } catch (err) {
+        console.error("Erro ao carregar dados do usuário ou materiais:", err);
+      }
+    };
+
+    fetchUserData();
+  }, [materiaSelecionada]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const atualizarProgresso = async () => {
+        if (!usuarioId) return;
+
+        try {
+          const responseProgresso = await UsuarioService.listarProgressoUsuario(usuarioId);
+          const progressoData = normalizarProgresso(responseProgresso.data);
+          setProgressoUsuario(progressoData);
+          console.log("Progresso atualizado ao focar na tela:", progressoData);
+        } catch (err) {
+          console.error("Erro ao atualizar progresso ao focar na tela:", err);
+        }
+      };
+
+      atualizarProgresso();
+    }, [usuarioId])
+  );
+
 
   const fetchMateriais = async () => {
     try {
@@ -63,24 +133,55 @@ export default function TelaLinguagens() {
   };
 
   const materiasAgrupadas = materiais.reduce((acc, item) => {
-    if (!acc[item.titulo]) acc[item.titulo] = {};
-    if (!acc[item.titulo][item.tema]) acc[item.titulo][item.tema] = [];
-    acc[item.titulo][item.tema].push(item);
+    if (!acc[item.tema]) acc[item.tema] = {};
+    if (!acc[item.tema][item.subtema]) acc[item.tema][item.subtema] = [];
+    acc[item.tema][item.subtema].push(item);
     return acc;
   }, {});
 
   const calcularProgresso = (atividades) => {
     if (!atividades || atividades.length === 0) return 0;
-    const total = atividades.reduce((sum, item) => sum + (item.progresso || 0), 0);
-    return Math.round(total / atividades.length);
+    if (!progressoUsuario || progressoUsuario.length === 0) return 0;
+
+    const total = atividades.length;
+    const concluidas = atividades.filter(a =>
+      progressoUsuario.some(p => p.atividade_id === a.id && p.concluida === 1)
+    ).length;
+
+    return Math.round((concluidas / total) * 100);
+  };
+
+  const normalizarProgresso = (data) => {
+    if (!data) return [];
+
+    if (Array.isArray(data)) return data;
+
+    if (typeof data === "object") {
+      return Object.values(data).flatMap(v => Array.isArray(v) ? v : [v]);
+    }
+
+    return [];
+  };
+
+  const atividadeConcluida = (atividadeId) => {
+    return progressoUsuario.some(p => p.atividade_id === atividadeId && p.concluida === 1);
   };
 
   const marcarAtividadeConcluida = async (item) => {
+    if (!usuarioId) return;
+
+    if (atividadeConcluida(item.id)) {
+      console.log(`Atividade ${item.id} já concluída. Nada a fazer.`);
+      return;
+    }
+
     try {
-      await UsuarioService.atualizarProgresso(usuarioId, item.id, item.titulo, item.tema, 100);
-      fetchMateriais();
+      await UsuarioService.atualizarProgresso(usuarioId, item.id);
+
+      setProgressoUsuario((prev) => [...prev, { atividade_id: item.id, concluida: 1 }]);
+      console.log(`Atividade ${item.id} marcada como concluída.`);
     } catch (err) {
-      console.error("Erro ao atualizar progresso:", err);
+      console.error("Erro ao marcar atividade como concluída:", err);
     }
   };
 
@@ -109,8 +210,9 @@ export default function TelaLinguagens() {
     }
 
     const formData = new FormData();
-    formData.append("titulo", titulo.trim());
     formData.append("tema", tema.trim());
+    formData.append("subtema", subtema.trim());
+    formData.append("titulo", titulo.trim());
     formData.append("materia", materiaSelecionada);
     formData.append("criado_por", usuarioId);
 
@@ -124,7 +226,7 @@ export default function TelaLinguagens() {
       }
 
       const response = await UsuarioService.publicarMateriaFormData(formData);
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert("Material enviado com sucesso!");
         setTitulo(""); setTema(""); setArquivoPdf(null); setModalVisible(false);
         fetchMateriais();
@@ -142,10 +244,10 @@ export default function TelaLinguagens() {
       {/* Header */}
       <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
         <Pressable style={styles.botao}>
-            <Image
-                source={require("../../../assets/Conquests_Icon.png")}
-                style={{ height: 50, width: 50 }}
-            />
+          <Image
+            source={require("../../../assets/Conquests_Icon.png")}
+            style={{ height: 50, width: 50 }}
+          />
         </Pressable>
         <Image source={require("../../../assets/Macawdemy_Letreiro.png")} resizeMode="contain" style={styles.imagehH1} />
         <View style={styles.rightIcons}>
@@ -207,7 +309,10 @@ export default function TelaLinguagens() {
                       return (
                         <View key={tema} style={[styles.temaContainer, { marginLeft: 0 }]}>
                           <TouchableOpacity
-                            style={[styles.temaHeader, progressoTema === 100 && styles.cardConcluida]}
+                            style={[
+                              styles.temaHeader,
+                              progressoTema === 100 && styles.temaHeaderConcluida,
+                            ]}
                             onPress={() => toggleTheme(tema)}
                           >
                             <Text style={[styles.temaTitulo, progressoTema === 100 && styles.textoConcluido]}>
@@ -215,10 +320,12 @@ export default function TelaLinguagens() {
                             </Text>
                             <MaterialIcons
                               name={expandedThemes[tema] ? "keyboard-arrow-up" : "keyboard-arrow-down"}
-                              size={24} color="black"
+                              size={24}
+                              color="black"
                             />
                           </TouchableOpacity>
 
+                          {/* Barra de progresso do tema */}
                           <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
                             <Text style={{ width: 40, fontWeight: "bold" }}>{progressoTema}%</Text>
                             <View style={[styles.progressBarBackground, { flex: 1 }]}>
@@ -226,34 +333,45 @@ export default function TelaLinguagens() {
                             </View>
                           </View>
 
+                          {/* Atividades do tema */}
                           {expandedThemes[tema] &&
-                            atividadesTema.map((item) => (
-                              <TouchableOpacity
-                                key={item.id}
-                                style={[styles.cardActivity, item.progresso === 100 && styles.cardConcluida]}
-                                onPress={() =>
-                                  navigation.navigate("TelaPDF", {
-                                    arquivoUrl: `http://localhost:3000/materias/pdf/${item.id}`,
-                                    atividadeId: item.id,
-                                    titulo: item.titulo,
-                                    tema: item.tema,
-                                    usuarioId,
-                                    totalPaginas: 1,
-                                  })
-                                }
-                                onLongPress={() => marcarAtividadeConcluida(item)}
-                              >
-                                <Text style={[styles.arquivo, item.progresso === 100 && styles.textoConcluido]}>
-                                  {item.titulo}
-                                </Text>
-                                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                  <Text style={{ width: 40, fontWeight: "bold" }}>{item.progresso}%</Text>
-                                  <View style={[styles.progressBarBackground, { flex: 1 }]}>
-                                    <View style={[styles.progressBarFill, { width: `${item.progresso}%` }]} />
-                                  </View>
+                          atividadesTema.map((item, index) => {
+                            const concluida = atividadeConcluida(item.id);
+                            const temProximo = index < atividadesTema.length - 1;
+
+                            return (
+                              <View key={item.id} style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                                {/* Área da bolinha + linha */}
+                                <View style={styles.bolinhaContainer}>
+                                  {/* Bolinha */}
+                                  <View style={styles.bolinha} />
+
+                                  {/* Linha vertical */}
+                                  {temProximo && <View style={styles.linhaVertical} />}
                                 </View>
-                              </TouchableOpacity>
-                            ))}
+
+                                {/* Card de arquivo */}
+                                <TouchableOpacity
+                                  style={[styles.cardActivity, concluida && styles.cardConcluida, { flex: 1 }]}
+                                  onPress={async () => {
+                                    navigation.navigate("TelaPDF", {
+                                      arquivoUrl: `http://localhost:3000/materias/pdf/${item.id}`,
+                                      atividadeId: item.id,
+                                      titulo: item.titulo,
+                                      tema: item.tema,
+                                      usuarioId,
+                                      totalPaginas: 1,
+                                    });
+                                  }}
+                                  onLongPress={() => marcarAtividadeConcluida(item)}
+                                >
+                                  <Text style={[styles.arquivo, concluida && styles.textoConcluido]}>
+                                    {item.titulo}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
+                            );
+                          })}
                         </View>
                       );
                     })}
@@ -264,10 +382,13 @@ export default function TelaLinguagens() {
         </View>
       </ScrollView>
 
+
       {/* Botão flutuante */}
-      <TouchableOpacity style={styles.floatingButton} onPress={() => setModalVisible(true)}>
-        <Text style={{ fontSize: 35, color: "#fff", marginBottom: 10 }}>+</Text>
-      </TouchableOpacity>
+      {isProfessor && (
+        <TouchableOpacity style={styles.floatingButton} onPress={() => setModalVisible(true)}>
+          <Text style={{ fontSize: 35, color: "#fff", marginBottom: 10 }}>+</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Modal de envio */}
       <Modal animationType="fade" transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}> 
@@ -299,6 +420,14 @@ export default function TelaLinguagens() {
               value={tema} 
               onChangeText={setTema} 
               placeholder="Digite o tema" 
+            /> 
+
+            <Text style={styles.label}>Subtema</Text> 
+            <TextInput 
+              style={styles.input} 
+              value={subtema} 
+              onChangeText={setSubtema} 
+              placeholder="Digite o Subtema" 
             /> 
 
             <Text style={styles.label}>Título</Text> 
@@ -336,35 +465,18 @@ const styles = StyleSheet.create({
   userBadge: { position: "absolute", height: 20, width: 20, bottom: 0, left: 0, alignItems: "center", justifyContent: "center" },
   userBadgeText: { fontWeight: "bold", color: "#FFF", fontSize: 8, top: 5, position: "absolute", alignSelf: "center" },
   emptyText: { fontSize: 16, color: "#555", textAlign: "center", marginTop: 20 },
-  temaContainer: { marginBottom: 10, backgroundColor: "#fff", borderRadius: 12, padding: 10 },
-  temaHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingTop: 5 },
+  temaContainer: { marginBottom: 5, backgroundColor: "#fff", borderRadius: 12, padding: 10 },
+  temaHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10, borderRadius: 8, backgroundColor: "#f0f4ff", marginBottom: 5, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3, elevation: 3, },
+  temaHeaderConcluida: { backgroundColor: "#C8E6C9", borderRadius: 8, padding: 10,},
   temaTitulo: { fontSize: 18, fontWeight: "bold", color: "#333" },
   materiaTitulo: { fontSize: 20, fontWeight: "bold", color: "#0c4499", marginBottom: 5 },
-  cardActivity: { backgroundColor: "#f0f4ff", borderRadius: 8, padding: 10, marginBottom: 10, flex: 1 },
+  cardActivity: { backgroundColor: "#f0f4ff", borderRadius: 8, padding: 10, marginTop: 10, marginBottom: 10, flex: 1 },
   arquivo: { fontSize: 14, color: "#555", marginBottom: 5 },
-  progressBarBackground: { height: 6, backgroundColor: "#ddd", borderRadius: 3, marginTop: 5, marginBottom: 10, flex: 1 },
+  progressBarBackground: { height: 6, backgroundColor: "#ddd", borderRadius: 3, marginTop: 5, marginBottom: 5, flex: 1 },
   progressBarFill: { height: 6, backgroundColor: "#4CAF50", borderRadius: 3 },
   cardConcluida: { backgroundColor: "#C8E6C9" },
   textoConcluido: { color: "#2E7D32", fontWeight: "bold" },
-  floatingButton: {
-    position: "absolute",
-    bottom: 100,
-    right: 20,
-    backgroundColor: "#0c4499",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    borderWidth: 2,
-    borderColor: "#fff", // contorno branco
-  },
+  floatingButton: { position: "absolute", bottom: 100, right: 20, backgroundColor: "#0c4499", width: 60, height: 60, borderRadius: 30, justifyContent: "center", alignItems: "center", zIndex: 1000, elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5,borderWidth: 2, borderColor: "#fff", },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
   modalContainer: { width: "85%", backgroundColor: "#fff", borderRadius: 10, padding: 20 },
   modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 15 },
@@ -377,4 +489,27 @@ const styles = StyleSheet.create({
   menuBarContainer: { position: "absolute", bottom: 0, left: 0, right: 0, height: 70, borderTopWidth: 1, borderTopColor: "#ccc", zIndex: 1000, elevation: 10 },
   mainContainer: { flex: 1, margin: 10, padding: 10, borderRadius: 15, backgroundColor: "#ecececff" },
   containerTitle: { fontSize: 28, marginLeft: 35, marginTop: 4, marginBottom: 10, fontWeight: "bold", color: "#000" },
+  bolinhaContainer: {
+    width: 20,
+    alignItems: "center",
+    // Faz a bolinha centralizar verticalmente em relação ao card
+    justifyContent: "flex-start",
+    marginTop: 10,
+  },
+
+  bolinha: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#000",
+    zIndex: 1,
+  },
+
+  linhaVertical: {
+    width: 2,
+    flex: 1,           // Faz a linha preencher verticalmente
+    backgroundColor: "#000",
+    marginTop: 2,      // Espaço entre bolinha e linha
+  },
+  cardTitulo: { fontSize: 16, fontWeight: "bold", marginBottom: 4, color: "#333" },
 });

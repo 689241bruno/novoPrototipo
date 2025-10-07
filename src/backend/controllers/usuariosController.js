@@ -72,10 +72,22 @@ exports.deletarUsuario = async (req, res) => {
 
 // Verificar tipo de usuário
 exports.verficarTipo = async (req, res) => {
-    const { email } = req.body;
+    const { email } = req.query;
+
     try {
         const tipo = await Usuario.checkUserType(email);
-        res.json(tipo);
+        if (!tipo) {
+            return res.status(404).json({ existe: false, erro: "Usuário não encontrado" });
+        }
+
+        console.log("Dados retornados de checkUserType:", tipo);
+
+        res.json({
+            existe: true, 
+            id: tipo.id,
+            nome: tipo.nome,
+            is_professor: tipo.is_professor
+        });
     } catch (err) {
         console.error("Erro no verificar tipo: ", err);
         res.status(500).json({ erro: "Erro ao verificar tipo de usuário! "});
@@ -84,7 +96,7 @@ exports.verficarTipo = async (req, res) => {
 
 // Verifica se usuário existe
 exports.checkUser = async (req, res) => {
-    const { email } = req.body;
+    const { email } = req.query;
     try {
         const existe = await Usuario.checkUser(email);
         res.json({ existe });

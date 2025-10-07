@@ -77,7 +77,7 @@ class Usuario {
 
   static async checkUserType(email, is_aluno, is_professor, is_admin) {
     const [rows] = await pool.query(
-      "SELECT is_aluno, is_professor, is_admin FROM usuarios WHERE email = ?",
+      "SELECT id, is_aluno, is_professor, is_admin FROM usuarios WHERE email = ?",
       [email]
     );
     return rows[0] || null;
