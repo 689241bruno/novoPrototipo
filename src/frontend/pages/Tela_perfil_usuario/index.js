@@ -13,6 +13,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
+import TopNavbar from "../../components/TopNavbar"; 
 
 // --- 1. Dados de Exemplo ---
 const userData = {
@@ -30,52 +31,9 @@ export default function ProfileContent() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <View delay={300} animation={"fadeInDown"} style={styles.header}>
-        <Pressable
-          style={styles.botao}
-          onPress={() => navigation.navigate("Ranking")}
-        >
-          <Image
-            source={require("../../assets/trophy.png")}
-            style={{ height: "80%", width: "80%" }}
-          />
-        </Pressable>
-        <Pressable
-          style={styles.botao}
-          onPress={() => navigation.navigate("Perfil")}
-        >
-          <Image
-            source={require("../../assets/user.png")}
-            style={{ height: "100%", width: "100%" }}
-          />
-          <View
-            style={{
-              position: "absolute",
-              height: 20,
-              width: 20,
-              bottom: 0,
-              left: 0,
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../../assets/star.png")}
-              style={{ height: 20, width: 20 }}
-            />
-            <Text
-              style={{
-                position: "absolute",
-                fontWeight: "bold",
-                color: "#FFF",
-                alignSelf: "center",
-                fontSize: 8,
-                top: 5,
-              }}
-            >
-              12
-            </Text>
-          </View>
-        </Pressable>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+          <TopNavbar />
+        </SafeAreaView>
       </View>
       <View style={styles.mainContent}>
         {/* Bloco do Avatar e Nome */}
@@ -156,9 +114,9 @@ export default function ProfileContent() {
               style={styles.menuIcon}
             />
             <Text style={styles.menuText}>Ajuda (FAQ)</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>  
         </View>
-      </View>
+      </View> 
     </ScrollView>
   );
 }

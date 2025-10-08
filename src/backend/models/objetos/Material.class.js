@@ -62,14 +62,17 @@ class Material {
         } else {
             await pool.query(
                 "INSERT INTO progresso_atividades (usuario_id, atividade_id, concluida) VALUES (?, ?, 1)",
-                [idUsuario, atividadeId, concluida]
+                [idUsuario, atividadeId]
             );
         }
     }
 
     static async listarProgresso(idUsuario){
         const [rows] = await pool.query(
-            "SELECT atividade_id, concluida FROM progresso_atividades WHERE usuario_id=?",
+            `SELECT p.atividade_id, p.concluida, m.materia
+            FROM progresso_atividades p
+            LEFT JOIN material m ON p.atividade_id = m.id
+            WHERE p.usuario_id=?`,
             [idUsuario]
         );
         return rows;

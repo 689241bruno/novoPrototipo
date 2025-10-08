@@ -39,7 +39,9 @@ export default function ContainerMateria(props) {
           progress={props.progress}
           height={15}
           color="green"
-          style={{ borderColor: "gray", width: 150 }}
+          style={{ borderColor: "gray", width: 330 }}
+          animationType="spring"
+          animated={true}
         />
       </View>
     </Animatable.View>
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
   secaoSecundaria: {
     alignSelf: "center",
     height: "30%",
-    width: "100%",
+    width: 330,
     borderRadius: 14,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -114,8 +116,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingRight: 15,
-    paddingLeft: 15,
-
     gap: 20,
   },
 });

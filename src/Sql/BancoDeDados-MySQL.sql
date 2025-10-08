@@ -51,12 +51,13 @@ CREATE TABLE IF NOT EXISTS material(
     FOREIGN KEY (criado_por) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS progresso_atividades(
-    usuario_id INT NOT NULL, 
+CREATE TABLE IF NOT EXISTS progresso_atividades (
+    usuario_id INT NOT NULL,
     atividade_id INT NOT NULL,
     concluida TINYINT(1) DEFAULT 0,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (atividade_id) REFERENCES material(id) ON DELETE CASCADE
+    FOREIGN KEY (atividade_id) REFERENCES material(id) ON DELETE CASCADE,
+    PRIMARY KEY (usuario_id, atividade_id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS notificacoes(

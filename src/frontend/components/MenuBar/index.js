@@ -1,4 +1,5 @@
 import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 
 const imagens = {
@@ -10,12 +11,17 @@ const imagens = {
 };
 
 export default function MenuBar() {
+  const navigation = useNavigation();
+  
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
         {/* Lado esquerdo */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.botao}>
+          <TouchableOpacity 
+            style={styles.botao}
+            onPress={() => navigation.navigate("PlanoEstudos")}
+          >
             <Image
               style={styles.icon}
               source={imagens.PlanoEstudos}
@@ -23,7 +29,10 @@ export default function MenuBar() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.botao}>
+          <TouchableOpacity 
+            style={styles.botao}
+            onPress={() => navigation.navigate("Flashcards")}
+          >
             <Image
               style={styles.icon}
               source={imagens.Flashcards}
@@ -34,7 +43,10 @@ export default function MenuBar() {
 
         {/* Botão central */}
         <View style={styles.sectionMeio}>
-          <TouchableOpacity style={styles.botaoMeio}>
+          <TouchableOpacity 
+            style={styles.botaoMeio}
+            onPress={() => navigation.navigate("Principal")}
+          >
             <Image
               style={styles.iconMeio}
               source={imagens.Home}
@@ -45,7 +57,10 @@ export default function MenuBar() {
 
         {/* Lado direito */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.botao}>
+          <TouchableOpacity 
+            style={styles.botao}
+            onPress={() => navigation.navigate("Ranking")}
+          >
             <Image
               style={styles.icon}
               source={imagens.Ranking}
@@ -53,7 +68,10 @@ export default function MenuBar() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.botao}>
+          <TouchableOpacity 
+            style={styles.botao}
+            onPress={() => navigation.navigate("Config")}
+          >
             <Image
               style={styles.icon}
               source={imagens.Config}

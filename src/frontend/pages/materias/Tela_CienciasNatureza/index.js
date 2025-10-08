@@ -10,6 +10,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import UsuarioService from "../../../services/UsuarioService";
 import MenuBar from "../../../components/MenuBar";
+import TopNavbar from "../../../components/TopNavbar"; 
 
 // Habilita animação de layout no Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -243,22 +244,9 @@ export default function TelaLinguagens() {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
       {/* Header */}
       <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
-        <Pressable style={styles.botao}>
-          <Image
-            source={require("../../../assets/Conquests_Icon.png")}
-            style={{ height: 50, width: 50 }}
-          />
-        </Pressable>
-        <Image source={require("../../../assets/Macawdemy_Letreiro.png")} resizeMode="contain" style={styles.imagehH1} />
-        <View style={styles.rightIcons}>
-          <Pressable style={styles.botao} onPress={() => navigation.navigate("Perfil")}>
-            <Image source={require("../../../assets/user.png")} style={{ height: "100%", width: "100%" }} />
-            <View style={styles.userBadge}>
-              <Image source={require("../../../assets/star.png")} style={{ height: 20, width: 20 }} />
-              <Text style={styles.userBadgeText}>12</Text>
-            </View>
-          </Pressable>
-        </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+          <TopNavbar />
+        </SafeAreaView>
       </Animatable.View>
 
       {/* ScrollView com materiais */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, Pressable, Platform } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, Pressable, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
@@ -7,6 +7,7 @@ import UsuarioService from '../../../services/UsuarioService';
 import * as Animatable from "react-native-animatable";
 import ContainerMateria from "../../../components/containerMateria";
 import MenuBar from "../../../components/MenuBar";
+import TopNavbar from "../../../components/TopNavbar"; 
 
 import Constants from "expo-constants";
 
@@ -83,40 +84,9 @@ export default function Atividade() {
         <View style={styles.container}>
             {/* Navbar superior */}
             <Animatable.View delay={300} animation={"fadeInDown"} style={styles.header}>
-                {/* Botão Troféu à esquerda */}
-                <Pressable style={styles.botao}>
-                    <Image
-                        source={require("../../../assets/trophy.png")}
-                        style={{ height: "80%", width: "80%" }}
-                    />
-                </Pressable>
-
-                <Image
-                    source={require("../../../assets/Macawdemy_Letreiro.png")}
-                    resizeMode="contain"
-                    style={styles.imagehH1}
-                ></Image>
-
-                {/* Ícones à direita */}
-                <View style={styles.rightIcons}>
-                    {/* Aqui você pode adicionar outro ícone */}
-                    <Pressable
-                        style={styles.botao}
-                        onPress={() => navigation.navigate("Perfil")}
-                    >
-                        <Image
-                            source={require("../../../assets/user.png")}
-                            style={{ height: "100%", width: "100%" }}
-                        />
-                        <View style={styles.userBadge}>
-                            <Image
-                                source={require("../../../assets/star.png")}
-                                style={{ height: 20, width: 20 }}
-                            />
-                            <Text style={styles.userBadgeText}>12</Text>
-                        </View>
-                    </Pressable>
-                </View>
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+                    <TopNavbar />     
+                </SafeAreaView>
             </Animatable.View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute', top: 90, left: 20, zIndex: 1 }}>

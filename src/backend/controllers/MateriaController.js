@@ -54,6 +54,7 @@ exports.atualizarProgresso = async (req, res) => {
 
 exports.listarProgressoUsuario = async (req, res) => {
     const { idUsuario } = req.params;
+    console.log("ID do usuário recebido no backend:", idUsuario);
     try {
         const rows = await Material.listarProgresso(idUsuario)
         res.json(rows);
