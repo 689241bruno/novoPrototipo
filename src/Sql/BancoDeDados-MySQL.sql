@@ -30,14 +30,14 @@ CREATE TABLE IF NOT EXISTS admin(
 
 CREATE TABLE IF NOT EXISTS alunos(
     usuario_id INT PRIMARY KEY,
-    diagnóstico TEXT,
+    modoIntensivo TINYINT(1) NOT NULL DEFAULT 0,
+    diagnostico TEXT,
     plano_estudo_id INT DEFAULT NULL,
     ranking INT DEFAULT 0, 
     xp BIGINT DEFAULT 0,
     progresso_percent TINYINT DEFAULT 0 CHECK (progresso_percent BETWEEN 0 AND 100),
-    ultima_atividade TEXT,
-    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (plano_estudo_id) REFERENCES planos_estudo(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS material(

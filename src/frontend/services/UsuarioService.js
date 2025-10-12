@@ -4,8 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = "http://localhost:3000"; // se for rodar no navegador -> http://localhost:3000
 
 class UsuarioService {
-  // Usuario
-
   static async getLoggedInUserEmail() {
     try {
       const email = await AsyncStorage.getItem('usuarioEmail');
@@ -55,34 +53,6 @@ class UsuarioService {
 
   static async recuperarSenha(email) {
     return axios.post(`${API_URL}/recuperar-senha`, { email });
-  }
-
-  // Materia
-
-  static async listarMaterias(materia, idUsuario) {
-    return axios.get(`${API_URL}/materias/${encodeURIComponent(materia)}`, {
-      params: { idUsuario },
-    });
-  }
-
-  static async publicarMateriaFormData(formData) {
-    return axios.post(`${API_URL}/materias/publicar`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-  }
-
-  // Progresso
-  static async atualizarProgresso(idUsuario, atividadeId, titulo, tema, progresso) {
-    return axios.post(`${API_URL}/materias/progresso`, {
-      idUsuario,
-      atividadeId,
-    });
-  }
-
-  static async listarProgressoUsuario(idUsuario, materia) {
-    return axios.get(
-      `${API_URL}/materias/progresso/${idUsuario}`
-    );
   }
 }
 

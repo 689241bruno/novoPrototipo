@@ -11,7 +11,7 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import Cloud from "../../components/Nuvem.js";
+import Cloud from "../components/Nuvem.js";
 import { BlurView } from "expo-blur";
 export default function Welcome() {
   const navigation = useNavigation();
@@ -23,7 +23,7 @@ export default function Welcome() {
         top={130}
         size={200}
         duration={20000}
-        source={require("../../assets/nuvem-1.png")}
+        source={require("../assets/nuvem-1.png")}
         direction="right"
         delay={0}
       />
@@ -33,7 +33,7 @@ export default function Welcome() {
         size={200}
         duration={23000}
         delay={0}
-        source={require("../../assets/nuvem-2.png")}
+        source={require("../assets/nuvem-2.png")}
         direction="left"
       />
 
@@ -41,7 +41,7 @@ export default function Welcome() {
         top={50}
         size={170}
         duration={30000}
-        source={require("../../assets/nuvem-3.png")}
+        source={require("../assets/nuvem-3.png")}
         direction="right"
         delay={0}
       />
@@ -50,7 +50,7 @@ export default function Welcome() {
         <Animatable.Image
           delay={600}
           animation={"fadeInUp"}
-          source={require("../../assets/macawdemy-logo-asa-levantada.png")}
+          source={require("../assets/macawdemy-logo-asa-levantada.png")}
           style={{
             position: "absolute",
             bottom: 0,

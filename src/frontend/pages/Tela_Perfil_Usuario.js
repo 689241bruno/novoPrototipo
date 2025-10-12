@@ -13,7 +13,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
-import TopNavbar from "../../components/TopNavbar"; 
+import TopNavbar from "../components/TopNavbar"; 
 
 // --- 1. Dados de Exemplo ---
 const userData = {

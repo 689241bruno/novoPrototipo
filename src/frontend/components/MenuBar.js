@@ -3,11 +3,11 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 
 const imagens = {
-  PlanoEstudos: require("../../assets/PlanoEstudos_Icon.png"),
-  Flashcards: require("../../assets/Flashcards_Icon.png"),
-  Home: require("../../assets/Home_Icon.png"),
-  Ranking: require("../../assets/Ranking_Icon.png"),
-  Config: require("../../assets/Config_Icon.png"),
+  PlanoEstudos: require("../assets/PlanoEstudos_Icon.png"),
+  Flashcards: require("../assets/Flashcards_Icon.png"),
+  Home: require("../assets/Home_Icon.png"),
+  Ranking: require("../assets/Ranking_Icon.png"),
+  Config: require("../assets/Config_Icon.png"),
 };
 
 export default function MenuBar() {
@@ -31,7 +31,7 @@ export default function MenuBar() {
 
           <TouchableOpacity 
             style={styles.botao}
-            onPress={() => navigation.navigate("Flashcards")}
+            onPress={() => navigation.navigate("Flashcard")}
           >
             <Image
               style={styles.icon}

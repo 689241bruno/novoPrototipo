@@ -8,12 +8,13 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
-import ContainerMateria from "../../components/containerMateria";
+import ContainerMateria from "../components/ContainerMateria";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
-import MenuBar from "../../components/MenuBar";
-import TopNavbar from "../../components/TopNavbar";
-import UsuarioService from "../../services/UsuarioService";
+import MenuBar from "../components/MenuBar";
+import TopNavbar from "../components/TopNavbar";
+import UsuarioService from "../services/UsuarioService";
+import MaterialService from '../services/MaterialService';
 import Constants from "expo-constants";
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -65,12 +66,12 @@ export default function Home() {
       if (!id) return;
       setUsuarioId(id);
 
-      const progressoData = await UsuarioService.listarProgressoUsuario(id);
+      const progressoData = await MaterialService.listarProgressoUsuario(id);
       const progressoMateria = {};
 
       await Promise.all(
         Object.keys(materiasMap).map(async materia => {
-          const materiaisMateria = (await UsuarioService.listarMaterias(materiasMap[materia], id)).data;
+          const materiaisMateria = (await MaterialService.listarMaterias(materiasMap[materia], id)).data;
           progressoMateria[materia] = calcularProgressoPorMateria(materia, materiaisMateria, progressoData.data);
         })
       );

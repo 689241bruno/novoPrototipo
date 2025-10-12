@@ -3,11 +3,11 @@ import * as Progress from "react-native-progress";
 import * as Animatable from "react-native-animatable";
 
 const imagens = {
-  Linguagens: require("../../assets/pilha-de-livros.png"),
-  Matemática: require("../../assets/matematica.png"),
-  CiênciasdaNatureza: require("../../assets/ambiental.png"),
-  CiênciasHumanas: require("../../assets/livro-de-historia.png"),
-  Redação: require("../../assets/redacao.png"),
+  Linguagens: require("../assets/pilha-de-livros.png"),
+  Matemática: require("../assets/matematica.png"),
+  CiênciasdaNatureza: require("../assets/ambiental.png"),
+  CiênciasHumanas: require("../assets/livro-de-historia.png"),
+  Redação: require("../assets/redacao.png"),
 };
 
 export default function ContainerMateria(props) {

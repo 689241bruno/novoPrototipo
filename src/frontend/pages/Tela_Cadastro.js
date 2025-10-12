@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import UsuarioService from "../../services/UsuarioService";
+import UsuarioService from "../services/UsuarioService";
 import { TextInput } from "react-native-paper";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -75,7 +75,7 @@ export default function Signin() {
       </Animatable.View>
       <View style={styles.h1}>
         <Image
-          source={require("../../assets/Macawdemy_Letreiro.png")}
+          source={require("../assets/Macawdemy_Letreiro.png")}
           resizeMode="contain"
           style={{ height: "100%" }}
         ></Image>

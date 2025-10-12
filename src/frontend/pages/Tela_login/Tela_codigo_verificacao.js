@@ -31,7 +31,7 @@ export default function CodigoVerificacao() {
       </Animatable.View>
       <View style={styles.h1}>
         <Image
-          source={require("../../../../assets/Macawdemy_Letreiro.png")}
+          source={require("../../assets/Macawdemy_Letreiro.png")}
           resizeMode="contain"
           style={{ height: "100%" }}
         ></Image>

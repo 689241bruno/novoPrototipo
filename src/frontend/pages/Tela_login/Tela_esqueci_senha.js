@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 
-import UsuarioService from "../../../services/UsuarioService";
+import UsuarioService from "../../services/UsuarioService";
 
 export default function Signin() {
   const navigation = useNavigation();
@@ -57,7 +57,7 @@ export default function Signin() {
       </Animatable.View>
       <View style={styles.h1}>
         <Image
-          source={require("../../../assets/Macawdemy_Letreiro.png")}
+          source={require("../../assets/Macawdemy_Letreiro.png")}
           resizeMode="contain"
           style={{ height: "100%" }}
         ></Image>

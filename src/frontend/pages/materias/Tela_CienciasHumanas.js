@@ -8,19 +8,20 @@ import * as Animatable from "react-native-animatable";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from 'expo-document-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import UsuarioService from "../../../services/UsuarioService";
-import MenuBar from "../../../components/MenuBar";
-import TopNavbar from "../../../components/TopNavbar"; 
+import UsuarioService from "../../services/UsuarioService";
+import MaterialService from '../../services/MaterialService';
+import MenuBar from "../../components/MenuBar";
+import TopNavbar from "../../components/TopNavbar";
 
 // Habilita animação de layout no Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function TelaLinguagens() {
+export default function Tela_CienciasHumanas() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { materia } = route.params || { materia: "Matemática" };
+  const { materia } = route.params || { materia: "Ciências Humanas" };
   const [isProfessor, setIsProfessor] = useState(false);
   const [usuarioId, setUsuarioId] = useState(null);
 
@@ -71,10 +72,10 @@ export default function TelaLinguagens() {
         }
         setUsuarioId(usuarioId);
 
-        const response = await UsuarioService.listarMaterias(materiaSelecionada, usuarioId);
+        const response = await MaterialService.listarMaterias(materiaSelecionada, usuarioId);
         setMateriais(response?.data || []);
 
-        const responseProgresso = await UsuarioService.listarProgressoUsuario(usuarioId);
+        const responseProgresso = await MaterialService.listarProgressoUsuario(usuarioId);
         console.log("Progresso recebido: ", responseProgresso.data);
 
         console.log("Progresso bruto recebido do backend:", responseProgresso.data);
@@ -100,7 +101,7 @@ export default function TelaLinguagens() {
         if (!usuarioId) return;
 
         try {
-          const responseProgresso = await UsuarioService.listarProgressoUsuario(usuarioId);
+          const responseProgresso = await MaterialService.listarProgressoUsuario(usuarioId);
           const progressoData = normalizarProgresso(responseProgresso.data);
           setProgressoUsuario(progressoData);
           console.log("Progresso atualizado ao focar na tela:", progressoData);
@@ -116,7 +117,7 @@ export default function TelaLinguagens() {
 
   const fetchMateriais = async () => {
     try {
-      const response = await UsuarioService.listarMaterias(materiaSelecionada, usuarioId);
+      const response = await MaterialService.listarMaterias(materiaSelecionada, usuarioId);
       setMateriais(response?.data || []);
     } catch (err) {
       console.error("Erro ao buscar materiais:", err);
@@ -177,7 +178,7 @@ export default function TelaLinguagens() {
     }
 
     try {
-      await UsuarioService.atualizarProgresso(usuarioId, item.id);
+      await MaterialService.atualizarProgresso(usuarioId, item.id);
 
       setProgressoUsuario((prev) => [...prev, { atividade_id: item.id, concluida: 1 }]);
       console.log(`Atividade ${item.id} marcada como concluída.`);
@@ -226,7 +227,7 @@ export default function TelaLinguagens() {
         formData.append("arquivo", { uri: arquivoPdf.uri, name: arquivoPdf.name, type: arquivoPdf.type });
       }
 
-      const response = await UsuarioService.publicarMateriaFormData(formData);
+      const response = await MaterialService.publicarMateriaFormData(formData);
       if (response.status === 201) {
         alert("Material enviado com sucesso!");
         setTitulo(""); setTema(""); setArquivoPdf(null); setModalVisible(false);

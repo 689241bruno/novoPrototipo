@@ -14,8 +14,8 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import * as Animatable from "react-native-animatable";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"; // Para a coroa
-import MenuBar from "../../components/MenuBar";
-import TopNavbar from "../../components/TopNavbar";
+import MenuBar from "../components/MenuBar";
+import TopNavbar from "../components/TopNavbar";
 // --- 1. Dados de Exemplo ---
 const rankingData = [
   { id: 1, rank: 1, name: "Usuário TOP 1", xp: 950000, studyTime: "15:30" },

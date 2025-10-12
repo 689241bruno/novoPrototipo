@@ -3,11 +3,12 @@ import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Dimensions, Ima
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
-import UsuarioService from '../../../services/UsuarioService';
+import UsuarioService from '../../services/UsuarioService';
+import MaterialService from '../../services/MaterialService';
 import * as Animatable from "react-native-animatable";
-import ContainerMateria from "../../../components/containerMateria";
-import MenuBar from "../../../components/MenuBar";
-import TopNavbar from "../../../components/TopNavbar"; 
+import ContainerMateria from "../../components/ContainerMateria";
+import MenuBar from "../../components/MenuBar";
+import TopNavbar from "../../components/TopNavbar"; 
 
 import Constants from "expo-constants";
 
@@ -60,7 +61,7 @@ export default function Atividade() {
         const marcarConcluida = async () => {
             if (!loading && usuarioId && atividadeId) {
                 try {
-                    await UsuarioService.atualizarProgresso(usuarioId, atividadeId, titulo, tema, 100);
+                    await MaterialService.atualizarProgresso(usuarioId, atividadeId, titulo, tema, 100);
                     setProgresso(100);
                 } catch (err) {
                     console.error("Erro ao marcar atividade concluída: ", err);
