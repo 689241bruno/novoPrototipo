@@ -13,11 +13,14 @@ import {
   Dimensions,
   Switch,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { Alert } from "react-native";
 import TopNavbar from "../components/TopNavbar";
 import MenuBar from "../components/MenuBar";
 import FlashcardService from "../services/FlashcardService";
+import AlunoService from "../services/AlunoService";
 
 export default function FlashcardsMateria({ route, navigation }) {
   const { materia } = route.params;
@@ -28,27 +31,127 @@ export default function FlashcardsMateria({ route, navigation }) {
   const [resposta, setResposta] = useState("");
   const [repeticoes, setRepeticoes] = useState(4);
   const [modoIntensivo, setModoIntensivo] = useState(false);
+  const [alunoId, setAlunoId] = useState(null);
+  const [abertoId, setAbertoId] = useState(null);
 
-  const { height } = Dimensions.get("window");
+  const { height, width } = Dimensions.get("window");
+  const larguraCard = (width - 15 * 3) / 2
+  const alturaCardFechado = height * 0.2; 
+  const alturaCardAberto = height * 0.5; 
 
-  // Carregar flashcards da matéria
+  // Carregar flashcards e modo intensivo do aluno
   useEffect(() => {
-    async function carregarFlashcards() {
+    async function carregarDados() {
       try {
+        console.log("Iniciando carregamento...");
+        
+        // Obter usuário logado
         const usuarioId = await FlashcardService.getUsuarioId();
-        if (usuarioId) {
-          const data = await FlashcardService.listarFlashcards(usuarioId);
-          const filtrados = data.filter((fc) => fc.materia === materia);
-          setFlashcards(filtrados);
+        console.log("UsuarioId retornado:", usuarioId);
+
+        if (!usuarioId) {
+          console.warn("Nenhum usuarioId encontrado — verifique o login!");
+          setLoading(false);
+          return;
         }
+
+        // Buscar dados do aluno associado ao usuário
+        const alunoResponse = await AlunoService.buscarAlunoPorId(usuarioId);
+        console.log("Retorno do alunoResponse:", alunoResponse?.data);
+
+        if (alunoResponse?.data) {
+          setAlunoId(alunoResponse.data.usuario_id); // garante que o ID do usuário seja definido
+          setModoIntensivo(!!alunoResponse.data.modoIntensivo); // define o modo intensivo conforme banco
+        }
+
+        // Buscar flashcards do usuário
+        const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
+
+        // Filtrar por matéria
+        const filtrados = flashcardsData.filter((fc) => fc.materia === materia);
+        setFlashcards(filtrados);
       } catch (err) {
-        console.error("Erro ao carregar flashcards:", err);
+
+        console.error("Erro ao carregar dados:", err);
+        console.log("URL com erro:", err.response?.config?.url);
+        console.log("Status do erro:", err.response?.status);
+        Alert.alert(
+          "Erro ao carregar dados",
+          `Ocorreu um erro ao buscar as informações.\n\nDetalhes: ${
+            err.response
+              ? `(${err.response.status}) ${err.response.config?.url}`
+              : err.message
+          }`
+        );
       } finally {
         setLoading(false);
       }
     }
-    carregarFlashcards();
+
+    carregarDados();
   }, [materia]);
+
+  const handleAbrirFlashcard = async (item) => {
+    const novoAberto = abertoId === item.id ? null : item.id;
+    setAbertoId(novoAberto);
+
+    if (novoAberto) {
+      await revisarFlashcard(item.id);
+    }
+  };
+
+  const renderFlashcard = ({ item }) => {
+    const aberto = abertoId === item.id;
+
+    // Largura responsiva:
+    const breakpoint = 500;
+    const larguraCard =
+      width < breakpoint ? (width - 3 * 15) / 2 : width - 2 * 15;
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => handleAbrirFlashcard(item)}
+        style={[
+          styles.card,
+          {
+            width: larguraCard,
+            minHeight: aberto ? alturaCardAberto : alturaCardFechado,
+            maxHeight: aberto ? alturaCardAberto : alturaCardFechado,
+          },
+        ]}
+      >
+        <Text style={styles.label}>Pergunta:</Text>
+        <Text
+          style={styles.text}
+          numberOfLines={aberto ? undefined : 3} // limita a 3 linhas quando fechado
+          ellipsizeMode="tail" // adiciona "..."
+        >
+          {item.pergunta}
+        </Text>
+
+        {aberto && (
+          <>
+            <Text style={styles.label}>Resposta:</Text>
+            <Text style={styles.text}>{item.resposta}</Text>
+
+            <Text style={styles.info}>
+              Última revisão:{" "}
+              {item.ultima_revisao
+                ? new Date(item.ultima_revisao).toLocaleDateString()
+                : "—"}
+            </Text>
+            <Text style={styles.info}>
+              Próxima revisão:{" "}
+              {item.proxima_revisao
+                ? new Date(item.proxima_revisao).toLocaleDateString()
+                : "—"}
+            </Text>
+          </>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   // Criar novo flashcard
   const criarFlashcard = async () => {
@@ -56,7 +159,6 @@ export default function FlashcardsMateria({ route, navigation }) {
       const usuarioId = await FlashcardService.getUsuarioId();
       if (!usuarioId) return;
 
-      // Bloqueia repetições menores que 6 se modo intensivo estiver ativo
       const repeticoesFinal = modoIntensivo && repeticoes < 6 ? 6 : repeticoes;
 
       await FlashcardService.criarFlashcard(
@@ -67,28 +169,66 @@ export default function FlashcardsMateria({ route, navigation }) {
         repeticoesFinal
       );
 
+      const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
+      setFlashcards(flashcardsData.filter((fc) => fc.materia === materia));
+
       setModalVisible(false);
       setPergunta("");
       setResposta("");
       setRepeticoes(4);
-      setModoIntensivo(false);
-
-      const data = await FlashcardService.listarFlashcards(usuarioId);
-      setFlashcards(data.filter((fc) => fc.materia === materia));
     } catch (err) {
       console.error("Erro ao criar flashcard:", err);
+      Alert.alert(
+        "Erro ao criar flashcard",
+        `Não foi possível criar o flashcard.\n\nDetalhes: ${
+          err.response
+            ? `(${err.response.status}) ${err.response.config?.url}`
+            : err.message
+        }`
+      );
     }
   };
 
-  // Marcar como revisado
+  // Atualizar modo intensivo no banco e no estado
+  const alternarModoIntensivo = async (valor) => {
+    try {
+      setModoIntensivo(valor);
+
+      if (alunoId) {
+        await AlunoService.ativarModoIntensivo(alunoId, valor);
+      }
+
+      if (valor && repeticoes < 6) setRepeticoes(6);
+    } catch (err) {
+      console.error("Erro ao atualizar modo intensivo:", err);
+      Alert.alert(
+        "Erro ao atualizar modo intensivo",
+        `Não foi possível atualizar o modo intensivo.\n\nDetalhes: ${
+          err.response
+            ? `(${err.response.status}) ${err.response.config?.url}`
+            : err.message
+        }`
+      );
+    }
+  };
+
+  // Marcar flashcard como revisado
   const revisarFlashcard = async (id) => {
     try {
       await FlashcardService.revisarFlashcard(id);
       const usuarioId = await FlashcardService.getUsuarioId();
-      const data = await FlashcardService.listarFlashcards(usuarioId);
-      setFlashcards(data.filter((fc) => fc.materia === materia));
+      const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
+      setFlashcards(flashcardsData.filter((fc) => fc.materia === materia));
     } catch (err) {
       console.error("Erro ao revisar flashcard:", err);
+      Alert.alert(
+        "Erro ao revisar flashcard",
+        `Não foi possível marcar o flashcard como revisado.\n\nDetalhes: ${
+          err.response
+            ? `(${err.response.status}) ${err.response.config?.url}`
+            : err.message
+        }`
+      );
     }
   };
 
@@ -105,8 +245,6 @@ export default function FlashcardsMateria({ route, navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <TopNavbar />
-
-      {/* Container branco (como na tela Materias) */}
       <View style={styles.whiteContainer}>
         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -126,40 +264,9 @@ export default function FlashcardsMateria({ route, navigation }) {
               Nenhum flashcard encontrado para {materia}.
             </Text>
           ) : (
-            <FlatList
-              data={flashcards}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={styles.listContainer}
-              renderItem={({ item }) => (
-                <View style={styles.card}>
-                  <Text style={styles.label}>Pergunta:</Text>
-                  <Text style={styles.text}>{item.pergunta}</Text>
-
-                  <Text style={styles.label}>Resposta:</Text>
-                  <Text style={styles.text}>{item.resposta}</Text>
-
-                  <Text style={styles.info}>
-                    Última revisão:{" "}
-                    {item.ultima_revisao
-                      ? new Date(item.ultima_revisao).toLocaleDateString()
-                      : "—"}
-                  </Text>
-                  <Text style={styles.info}>
-                    Próxima revisão:{" "}
-                    {item.proxima_revisao
-                      ? new Date(item.proxima_revisao).toLocaleDateString()
-                      : "—"}
-                  </Text>
-
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => revisarFlashcard(item.id)}
-                  >
-                    <Text style={styles.buttonText}>Marcar como revisado</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            />
+            <View style={styles.cardsContainer}>
+              {flashcards.map((item) => renderFlashcard({ item }))}
+            </View>
           )}
         </ScrollView>
       </View>
@@ -172,7 +279,7 @@ export default function FlashcardsMateria({ route, navigation }) {
         <MaterialIcons name="add" size={30} color="#fff" />
       </TouchableOpacity>
 
-      {/* Modal de criação de flashcard */}
+      {/* Modal de criação */}
       <Modal
         animationType="fade"
         transparent
@@ -224,10 +331,7 @@ export default function FlashcardsMateria({ route, navigation }) {
               <Text style={styles.label}>Modo intensivo</Text>
               <Switch
                 value={modoIntensivo}
-                onValueChange={(val) => {
-                  setModoIntensivo(val);
-                  if (val && repeticoes < 6) setRepeticoes(6);
-                }}
+                onValueChange={alternarModoIntensivo}
                 thumbColor={modoIntensivo ? "#0b4e91" : "#ccc"}
               />
             </View>
@@ -246,6 +350,7 @@ export default function FlashcardsMateria({ route, navigation }) {
   );
 }
 
+// 🔹 Estilos (mantidos iguais)
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#0b4e91ff" },
   whiteContainer: {
@@ -357,4 +462,38 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     elevation: 10,
   },
+  cardsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+  },
+  card: {
+    margin: 5,
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+    justifyContent: "flex-start",
+    minWidth: 100,
+    maxWidth: 200,
+    flexGrow: 1,
+  },
+  cardFechado: {
+    minHeight: 80,  
+    maxHeight: 80,  
+    backgroundColor: "#fff",
+  },
+  cardAberto: {
+    backgroundColor: "#f9f9f9",
+    minHeight: 80,
+    maxHeight: 80,
+  },
+  text: {
+    marginBottom: 10,
+    color: "#2f3640",
+    flexShrink: 1,
+  }
 });

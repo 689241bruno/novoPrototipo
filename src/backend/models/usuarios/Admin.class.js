@@ -1,6 +1,6 @@
 const Usuario = require("./Usuario.class");
 
-class Admin {
+class Admin extends Usuario{
     constructor(...args) {
         super(...args);
     }

@@ -5,10 +5,13 @@ import Inicial from "../pages/Tela_Inicial.js";
 import Login from "../pages/Tela_login/Tela_Login.js";
 import Cadastro from "../pages/Tela_Cadastro.js";
 import Principal from "../pages/Tela_Principal.js";
+import Conquistas from "../pages/Tela_Conquistas.js";
 import PerfilUsuario from "../pages/Tela_Perfil_Usuario.js";
+import PlanoDeEstudos from "../pages/Tela_PlanoDeEstudos.js";
 import Flashcard from "../pages/Tela_Flashcards.js";
 import FlashcardsMateria from "../pages/Tela_FlashcardsMateria.js";
 import Ranking from "../pages/Tela_Ranking.js";
+import Configuracoes from "../pages/Tela_Configuracoes.js";
 
 // Telas de recuperação de senha
 import EsqueciSenha from "../pages/Tela_login/Tela_esqueci_senha.js";
@@ -55,8 +58,20 @@ export default function Routes() {
       />
 
       <Stack.Screen
+        name="Conquistas"
+        component={Conquistas}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
         name="PerfilUsuario"
         component={PerfilUsuario}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="PlanoDeEstudos"
+        component={PlanoDeEstudos}
         options={{ headerShown: false }}
       />
 
@@ -75,6 +90,12 @@ export default function Routes() {
       <Stack.Screen
         name="Ranking"
         component={Ranking}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="Configuracoes"
+        component={Configuracoes}
         options={{ headerShown: false }}
       />
 

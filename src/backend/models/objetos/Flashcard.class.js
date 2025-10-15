@@ -45,17 +45,7 @@ class Flashcard {
                 [usuario_id, pergunta, resposta, materia, ultimaRevisao, proximaRevisao, repeticoes, dificuldade]
             );
 
-            return {
-                id: result.insertId,
-                usuario_id,
-                pergunta,
-                resposta,
-                materia,
-                ultimaRevisao,
-                proximaRevisao,
-                repeticoes,
-                dificuldade,
-            };
+            return result.insertId;
         } catch (err) {
             console.error("Erro ao criar Flashcard: ", err.sqlMessage || err.message);
             throw new Error("Erro ao criar Flashcard.");

@@ -1,90 +1,92 @@
 const Usuario = require("./Usuario.class");
-const pool = require("../../config/db");
+const connection = require("../../config/db");
 
-class Aluno {
+class Aluno extends Usuario {
     constructor(
-        id, 
         usuario_id,
-        modoIntensivo   = false,
-        diagnostico     = "",
-        planoEstudosId,
-        ranking         = 0,
-        xp              = 0,
-        progresso       = 0 
+        modoIntensivo = false,
+        diagnostico = "",
+        planoEstudosId = null,
+        ranking = 0,
+        xp = 0,
+        progresso_percent = 0
     ) {
-        super(id);
-        this.usuario_id     = usuario_id;
-        this.modoIntensivo  = modoIntensivo;
-        this.diagnostico    = diagnostico;
+        super(usuario_id); // herda da classe Usuario
+        this.usuario_id = usuario_id;
+        this.modoIntensivo = modoIntensivo;
+        this.diagnostico = diagnostico;
         this.planoEstudosId = planoEstudosId;
-        this.ranking        = ranking;
-        this.xp             = xp;
-        this.progresso      = progresso;
+        this.ranking = ranking;
+        this.xp = xp;
+        this.progresso_percent = progresso_percent;
     }
 
+    // Listar todos os alunos
     static async listar() {
-        const [rows] = await pool.query("SELECT * FROM alunos");
+        const [rows] = await connection.query("SELECT * FROM alunos");
         return rows;
     }
 
-    static async cadastrar(usuario_id, modoIntensivo = false, diagnostico = "", planoEstudosId = null) {
+    // Cadastrar novo aluno
+    static async cadastrar(usuario_id, modoIntensivo = false, diagnostico = "", planoEstudosId = null, connection) {
         try {
-            const [result] = await pool.query(
-                "INSERT INTO alunos (usuario_id, modoIntensivo, diagnostico, plano_estudo_id, ranking, xp, progresso) VALUES (?, ?, ?, ?, 0, 0, 0,)",
-                [usuario_id, modoIntensivo, diagnostico, plano_estudo_id]
+            await connection.query(
+                `INSERT INTO alunos 
+                (usuario_id, modoIntensivo, diagnostico, plano_estudo_id, ranking, xp, progresso_percent) 
+                VALUES (?, ?, ?, ?, 0, 0, 0)`,
+                [usuario_id, modoIntensivo, diagnostico, planoEstudosId]
             );
-            return {
-                id: result.insertId,
-                usuario_id,
-                modoIntensivo, 
-                diagnostico, 
-                planoEstudosId,
-                ranking: 0,
-                xp: 0,
-                progresso: 0,
-            };
+            return usuario_id;
         } catch (err) {
-            console.error("Erro ao cadastrar aluno: ", err.sqlMessage || err.message);
-            throw new Error("Erro ao cadastrar aluno: ", err.sqlMessage || err.message);
+            console.error("Erro ao cadastrar aluno:", err.sqlMessage || err.message);
+            throw new Error("Erro ao cadastrar aluno: " + (err.sqlMessage || err.message));
         }
     }
 
-    static async editar(id, dados) {
-        const { modoIntensivo, diagnostico, planoEstudosId, ranking, xp, progresso } = dados;
-        await pool.query(
-            "UPDATE alunos SET modoIntensivo = ?, diagnostico = ?, planoEstudosId = ?, ranking = ?, xp = ?, progresso = ? WHERE id = ?",
-            [modoIntensivo, diagnostico, planoEstudosId, ranking, xp, progresso]
+    // Editar informações do aluno
+    static async editar(usuario_id, dados) {
+        const { modoIntensivo, diagnostico, planoEstudosId, ranking, xp, progresso_percent } = dados;
+        await connection.query(
+            `UPDATE alunos 
+            SET modoIntensivo = ?, diagnostico = ?, plano_estudo_id = ?, ranking = ?, xp = ?, progresso_percent = ? 
+            WHERE usuario_id = ?`,
+            [modoIntensivo, diagnostico, planoEstudosId, ranking, xp, progresso_percent, usuario_id]
         );
         return true;
     }
 
-    static async deletar(id) {
-        await pool.query("DELETE FROM alunos WHERE id = ?," [id]);
+    // Deletar aluno
+    static async deletar(usuario_id) {
+        await connection.query("DELETE FROM alunos WHERE usuario_id = ?", [usuario_id]);
         return true;
     }
 
-    static async buscarPorId(id) {
-        const [rows] = await pool.query("SELECT * FROM alunos WHERE id = ?", [id]);
+    // Buscar aluno por ID
+    static async buscarPorId(usuario_id) {
+        const [rows] = await connection.query("SELECT * FROM alunos WHERE usuario_id = ?", [usuario_id]);
         return rows[0] || null;
     }
 
-    static async ativarModoIntensivo(id, modoIntensivo = true) {
-        await pool.query("UPDATE alunos SET modoIntensivo = ? WHERE id = ?", [modoIntensivo, id]);
+    // Ativar ou desativar modo intensivo
+    static async ativarModoIntensivo(usuario_id, modoIntensivo = true) {
+        await connection.query("UPDATE alunos SET modoIntensivo = ? WHERE usuario_id = ?", [modoIntensivo, usuario_id]);
         return true;
     }
 
-    static async checkRanking(id) {
-        const [rows] = await pool.query("SELECT ranking, xp FROM alunos WHERE id = ?", [id]);
+    // Consultar ranking e XP
+    static async checkRanking(usuario_id) {
+        const [rows] = await connection.query("SELECT ranking, xp FROM alunos WHERE usuario_id = ?", [usuario_id]);
         return rows[0] || null;
     }
 
-    enviarRedacao ( redacao ) {
+    // Métodos de instância — se for usar no futuro
+    enviarRedacao(redacao) {
         this.redacoes.push(redacao);
         return true;
     }
 
-    static async criarFlashcard( flashcards ) {
-        this.flashcards.push(flashcards);
+    criarFlashcard(flashcard) {
+        this.flashcards.push(flashcard);
         return true;
     }
 }

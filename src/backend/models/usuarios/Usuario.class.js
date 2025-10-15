@@ -1,8 +1,4 @@
 const pool = require("../../config/db");
-const Aluno = require("./Aluno.class");
-const Professor = require("./Professor.class");
-const Admin = require("./Admin.class");
-
 class Usuario {
   constructor(
     id,
@@ -31,33 +27,15 @@ class Usuario {
     return rows;
   }
 
-  static async cadastrar(nome, email, senha, is_aluno, is_professor, is_admin) {
-    const connection = await pool.getConnection();
+  static async cadastrar(nome, email, senha, is_aluno, is_professor, is_admin, connection) {
     try {
-      await connection.beginTransaction();
-
-      // Cadastra usuário base
       const [result] = await connection.query(
-        "INSERT INTO usuarios (nome, email, senha, is_aluno, is_professor, is_admin) VALUES (?, ?, ?, ?, ?, ?)",
+        `INSERT INTO usuarios (nome, email, senha, is_aluno, is_professor, is_admin)
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [nome, email, senha, is_aluno, is_professor, is_admin]
       );
 
       const usuario_id = result.insertId;
-
-      // Cria perfil Aluno (sempre obrigatório)
-      await Aluno.cadastrar(usuario_id);
-
-      // Se professor → cria na tabela professor
-      if (is_professor) {
-        await Professor.cadastrar(usuario_id);
-      }
-
-      // Se admin → cria na tabela admin
-      if (is_admin) {
-        await Admin.cadastrar(usuario_id);
-      }
-
-      await connection.commit();
 
       return {
         id: usuario_id,
@@ -68,11 +46,8 @@ class Usuario {
         is_admin,
       };
     } catch (err) {
-      await connection.rollback();
       console.error("Erro SQL no cadastrar usuário:", err.sqlMessage || err.message);
       throw new Error("Erro ao cadastrar usuário: " + (err.sqlMessage || err.message));
-    } finally {
-      connection.release();
     }
   }
 

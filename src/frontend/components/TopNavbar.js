@@ -11,7 +11,7 @@ export default function TopNavbar() {
       {/* Ícone esquerdo - Conquests */}
       <Pressable
         style={styles.iconButton}
-        onPress={() => navigation.navigate("Conquests")}
+        onPress={() => navigation.navigate("Conquistas")}
       >
         <Image
           source={require("../assets/Conquests_Icon.png")}
@@ -30,7 +30,7 @@ export default function TopNavbar() {
       {/* Ícone direito - Perfil */}
       <Pressable
         style={styles.iconButton}
-        onPress={() => navigation.navigate("Perfil")}
+        onPress={() => navigation.navigate("PerfilUsuario")}
       >
         <Image
           source={require("../assets/user.png")}

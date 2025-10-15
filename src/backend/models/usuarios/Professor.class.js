@@ -1,7 +1,6 @@
 const Usuario = require("./Usuario.class");
 const pool = require("../../config/db")
-
-class Professor {
+class Professor extends Usuario {
     constructor(...args) {
         super(...args);
         this.materia = '';

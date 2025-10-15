@@ -30,11 +30,11 @@ exports.cadastrarAluno = async (req, res) => {
 
 exports.editarAluno = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { usuario_id } = req.params;
         const dados = req.body;
-        console.log("Requisição editarAluno:", { id, dados });
+        console.log("Requisição editarAluno:", { usuario_id, dados });
 
-        await Aluno.editar(id, dados);
+        await Aluno.editar(usuario_id, dados);
         res.json({ mensagem: "Aluno atualizado com sucesso!" });
     } catch (err) {
         console.error("Erro ao editar aluno:", err);
@@ -44,10 +44,10 @@ exports.editarAluno = async (req, res) => {
 
 exports.deletarAluno = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log("Requisição deletarAluno:", { id });
+        const { usuario_id } = req.params;
+        console.log("Requisição deletarAluno:", { usuario_id });
 
-        await Aluno.deletar(id);
+        await Aluno.deletar(usuario_id);
         res.json({ mensagem: "Aluno deletado com sucesso!" });
     } catch (err) {
         console.error("Erro ao deletar aluno:", err);
@@ -57,13 +57,14 @@ exports.deletarAluno = async (req, res) => {
 
 exports.buscarAlunoPorId = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log("Requisição buscarAlunoPorId:", { id });
+        const { usuario_id } = req.params;
+        const aluno = await Aluno.buscarPorId(usuario_id);
 
-        const aluno = await Aluno.buscarPorId(id);
-        if (!aluno) return res.status(404).json({ erro: "Aluno não encontrado." });
+        if (!aluno) {
+            return res.status(404).json({ erro: "Aluno não encontrado." });
+        }
 
-        res.json(aluno);
+        res.json({ data: aluno });
     } catch (err) {
         console.error("Erro ao buscar aluno:", err);
         res.status(500).json({ erro: "Erro ao buscar aluno." });
@@ -72,11 +73,11 @@ exports.buscarAlunoPorId = async (req, res) => {
 
 exports.ativarModoIntensivo = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { usuario_id } = req.params;
         const { modoIntensivo } = req.body;
-        console.log("Requisição ativarModoIntensivo:", { id, modoIntensivo });
+        console.log("Requisição ativarModoIntensivo:", { usuario_id, modoIntensivo });
 
-        await Aluno.ativarModoIntensivo(id, modoIntensivo);
+        await Aluno.ativarModoIntensivo(usuario_id, modoIntensivo);
         res.json({ mensagem: "Modo intensivo atualizado com sucesso!" });
     } catch (err) {
         console.error("Erro ao ativar modo intensivo:", err);
@@ -86,10 +87,10 @@ exports.ativarModoIntensivo = async (req, res) => {
 
 exports.checkRanking = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log("Requisição checkRanking:", { id });
+        const { usuario_id } = req.params;
+        console.log("Requisição checkRanking:", { usuario_id });
 
-        const ranking = await Aluno.checkRanking(id);
+        const ranking = await Aluno.checkRanking(usuario_id);
         res.json(ranking);
     } catch (err) {
         console.error("Erro ao verificar ranking:", err);

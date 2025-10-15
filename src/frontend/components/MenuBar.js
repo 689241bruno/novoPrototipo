@@ -20,7 +20,7 @@ export default function MenuBar() {
         <View style={styles.section}>
           <TouchableOpacity 
             style={styles.botao}
-            onPress={() => navigation.navigate("PlanoEstudos")}
+            onPress={() => navigation.navigate("PlanoDeEstudos")}
           >
             <Image
               style={styles.icon}
@@ -70,7 +70,7 @@ export default function MenuBar() {
 
           <TouchableOpacity 
             style={styles.botao}
-            onPress={() => navigation.navigate("Config")}
+            onPress={() => navigation.navigate("Configuracoes")}
           >
             <Image
               style={styles.icon}

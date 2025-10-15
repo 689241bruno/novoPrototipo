@@ -33,10 +33,16 @@ export default function Signin() {
 
     try {
       const response = await UsuarioService.loginUsuario(
-        emailLimpo,
+        emailLimpo, 
         senhaLimpa
       );
+      const usuarioData = response.data.usuario;
       console.log(response.data);
+
+      await AsyncStorage.setItem('usuarioEmail', emailLimpo);
+      await AsyncStorage.setItem('usuario', JSON.stringify(usuarioData));
+      console.log("Usuário salvo:", usuarioData);
+
       setEmail("");
       setSenha("");
       alert("Usuário logado!");
@@ -51,8 +57,6 @@ export default function Signin() {
         alert("Erro ao tentar logar. Tente novamente.");
       }
     }
-
-    await AsyncStorage.setItem('usuarioEmail', emailLimpo);
   };
 
   return (

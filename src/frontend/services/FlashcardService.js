@@ -69,10 +69,16 @@ class FlashcardService {
   static async getUsuarioId() {
     try {
       const usuario = await AsyncStorage.getItem("usuario");
-      return usuario ? JSON.parse(usuario).id : null;
+      if (!usuario) {
+          console.warn("Nenhum usuário salvo no AsyncStorage");
+          return null;
+      }
+      const parsed = JSON.parse(usuario);
+      console.log("ID do usuário no AsyncStorage:", parsed.id);
+      return parsed.id || null;
     } catch (err) {
-      console.error("Erro ao obter ID do usuário logado:", err);
-      return null;
+        console.error("Erro ao obter ID do usuário logado:", err);
+        return null;
     }
   }
 }

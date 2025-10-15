@@ -1,4 +1,7 @@
 const Usuario = require("../models/usuarios/Usuario.class");
+const Aluno = require("../models/usuarios/Aluno.class");
+const Professor = require("../models/usuarios/Professor.class");
+const Admin = require("../models/usuarios/Admin.class");
 
 // Lista todos os usuários
 exports.listarUsuarios = async (req, res) => {
@@ -13,21 +16,62 @@ exports.listarUsuarios = async (req, res) => {
 
 // Cria um novo usuário 
 exports.criarUsuario = async (req, res) => {
-    console.log("Dados recebidos no cadastro:", req.body); 
-
+    console.log("📩 Dados recebidos no cadastro:", req.body);
     const { nome, email, senha, is_aluno, is_professor, is_admin } = req.body;
-    try { 
-        const novoUsuario = await Usuario.cadastrar(nome, email, senha, is_aluno, is_professor, is_admin);
-        res.status(201).json(novoUsuario);    
-    }  catch (err) {
-        console.error("Erro no cadastro: ", err);
 
-        if (err.code === "ER_DUP_ENTRY") {
-        return res.status(400).json({ mensagem: "Este email já está cadastrado!" });
+    const pool = require("../config/db");
+    const connection = await pool.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        // Cria o usuário base
+        const usuario = await Usuario.cadastrar(
+            nome,
+            email,
+            senha,
+            is_aluno,
+            is_professor,
+            is_admin,
+            connection // 👈 passa a conexão aqui
+        );
+
+        const usuario_id = usuario.id;
+
+        // Se for aluno
+        if (is_aluno) {
+            await Aluno.cadastrar(usuario_id, false, "", null, connection); // 👈 mesma conexão
+        }
+
+        // Se for professor
+        if (is_professor) {
+            await Professor.cadastrar(usuario_id, connection);
+        }
+
+        // Se for admin
+        if (is_admin) {
+            await Admin.cadastrar(usuario_id, connection);
+        }
+
+        await connection.commit();
+
+        res.status(201).json({
+            mensagem: "Usuário cadastrado com sucesso!",
+            usuario_id,
+            nome,
+            email,
+            is_aluno,
+            is_professor,
+            is_admin,
+        });
+    } catch (err) {
+        await connection.rollback();
+        console.error("Erro no cadastro:", err);
+        res.status(500).json({ erro: "Erro ao criar usuário!" });
+    } finally {
+        connection.release();
     }
-        res.status(500).json({ mensagem: "Erro ao criar usuário! ", erro: err.message});
-    }
-}
+};
 
 // Login 
 exports.login = async (req, res) => {
@@ -36,7 +80,10 @@ exports.login = async (req, res) => {
         const usuario = await Usuario.login(email, senha);
         
         if (usuario) {
-            res.status(200).json({ mensagem: "Usuário logado com sucesso!" });
+            res.status(200).json({ 
+                mensagem: "Usuário logado com sucesso!",
+                usuario: usuario
+            });
         } else {
             res.status(401).json({ erro: "Email ou senha inválidos!" });
         }   
