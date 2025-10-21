@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-SafeAreaView,
-View,
-Text,
-StyleSheet,
-ScrollView,
-Image,
-TouchableOpacity,
-Dimensions,
+    SafeAreaView,
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    Image,
+    TouchableOpacity,
+    Dimensions,
 } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import TopNavbar from "../components/TopNavbar";
 import MenuBar from "../components/MenuBar";
 import ProgressBar from "../components/ProgressBar";
-
+import DesafiosService from "../services/DesafioService";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -25,43 +26,60 @@ const sampleData = [
 ];
 
 
-export default function Tela_Conquistas() {
+export default function Tela_Desafios() {
+    const [desafios, setDesafios] = useState([]);
+
+    const fetchDesafios = async () => {
+        const data = await DesafiosService.listarDesafios();
+        setDesafios(data);
+    };
+
+    useEffect(() => {
+        fetchDesafios();
+    }, []);
+
+    const concluirDesafio = async (desafio) => {
+        const usuario = await AsyncStorage.getItem("usuario");
+        const usuario_id = usuario ? JSON.parse(usuario).id : null;
+        if (!usuario_id) return;
+
+        await DesafiosService.marcarConcluido(usuario_id, desafio.id);
+        fetchDesafios();
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <TopNavbar />
-
             <View style={styles.whiteContainer}>
                 <Text style={styles.headerTitle}>Desafios Semanais</Text>
-
-
                 <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-                    {sampleData.map((item) => (
+                    {desafios.map((item) => (
                         <View key={item.id} style={styles.card}>
                             <View style={styles.cardRow}>
-                            <View style={styles.imagePlaceholder}>
-                            {/* Substitua por <Image source={...} /> se tiver imagem */}
-                            <Text style={styles.x}>🗂️</Text>
-                        </View>
-
-
-                        <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>{item.title}</Text>
-                        <Text style={styles.cardDesc} numberOfLines={2}>{item.desc}</Text>
-
-
-                        <View style={{ marginTop: 8 }}>
-                            <ProgressBar progress={item.progress} height={12} />
-                            <Text style={styles.progressText}>{Math.round(item.progress * 100)}%</Text>
-                            </View>
-                            </View>
+                                <View style={styles.imagePlaceholder}>
+                                    {item.img ? <Image source={{ uri: `data:image/png;base64,${item.img}` }} style={{ width: 60, height: 60 }} /> : <Text style={styles.x}>🗂️</Text>}
+                                </View>
+                                <View style={styles.cardContent}>
+                                    <Text style={styles.cardTitle}>{item.titulo}</Text>
+                                    <Text style={styles.cardDesc} numberOfLines={2}>{item.descricao}</Text>
+                                    <View style={{ marginTop: 8 }}>
+                                        <ProgressBar progress={item.progresso || 0} height={12} />
+                                        <Text style={styles.progressText}>{Math.round((item.progresso || 0) * 100)}%</Text>
+                                    </View>
+                                    {!item.concluida ? (
+                                        <TouchableOpacity onPress={() => concluirDesafio(item)} style={{ marginTop: 6 }}>
+                                            <Text style={{ color: '#0b4e91', fontWeight: '700' }}>Marcar como concluído ✅</Text>
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <Text style={{ marginTop: 6, color: 'green', fontWeight: '700' }}>Concluído ✔️</Text>
+                                    )}
+                                </View>
                             </View>
                         </View>
                     ))}
                     <View style={{ height: 120 }} />
                 </ScrollView>
             </View>
-
-
             <View style={styles.menuBarContainer}>
                 <MenuBar />
             </View>

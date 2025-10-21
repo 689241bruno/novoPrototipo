@@ -11,7 +11,7 @@ export default function TopNavbar() {
       {/* Ícone esquerdo - Conquests */}
       <Pressable
         style={styles.iconButton}
-        onPress={() => navigation.navigate("Conquistas")}
+        onPress={() => navigation.navigate("Desafios")}
       >
         <Image
           source={require("../assets/Conquests_Icon.png")}

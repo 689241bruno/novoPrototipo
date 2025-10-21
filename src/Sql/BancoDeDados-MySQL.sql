@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS alunos(
     xp BIGINT DEFAULT 0,
     progresso_percent TINYINT DEFAULT 0 CHECK (progresso_percent BETWEEN 0 AND 100),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (plano_estudo_id) REFERENCES planos_estudo(id) ON DELETE CASCADE
+    FOREIGN KEY (plano_estudo_id) REFERENCES plano_estudos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS material(
@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS progresso_atividades (
     usuario_id INT NOT NULL,
     atividade_id INT NOT NULL,
     concluida TINYINT(1) DEFAULT 0,
+    concluida_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (atividade_id) REFERENCES material(id) ON DELETE CASCADE,
     PRIMARY KEY (usuario_id, atividade_id)
@@ -66,6 +67,25 @@ CREATE TABLE IF NOT EXISTS notificacoes(
     destinatario_id INT NOT NULL, 
     lida TINYINT DEFAULT 0,
     FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS desafios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255),
+    xp INT DEFAULT 0,
+    img LONGBLOB
+);
+
+CREATE TABLE IF NOT EXISTS progresso_desafios (
+    usuario_id INT NOT NULL,
+    desafio_id INT NOT NULL,
+    progresso INT DEFAULT 0,
+    concluida TINYINT(1) DEFAULT 0,
+    concluida_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (usuario_id, desafio_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (desafio_id) REFERENCES desafios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS flashcards(
@@ -101,12 +121,14 @@ CREATE TABLE IF NOT EXISTS redacoes(
     FOREIGN KEY (corrigida_por_professor) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS planos_estudo(
+CREATE TABLE IF NOT EXISTS plano_estudos(
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
-    data_inicio DATE,
-    cronograma DATE, 
-    materiais TEXT,
+    dia DATE NOT NULL,
+    materia TEXT,
+    tema TEXT,
+    inicio TIME,
+    termino TIME,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

@@ -227,7 +227,7 @@ export default function Tela_Linguagens() {
         formData.append("arquivo", { uri: arquivoPdf.uri, name: arquivoPdf.name, type: arquivoPdf.type });
       }
 
-      const response = await MaterialService.publicarMateriaFormData(formData);
+      const response = await MaterialService.publicarMateria(formData);
       if (response.status === 201) {
         alert("Material enviado com sucesso!");
         setTitulo(""); setTema(""); setArquivoPdf(null); setModalVisible(false);
@@ -472,8 +472,8 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: "bold" },
   label: { marginTop: 10, marginBottom: 5, fontWeight: "bold" },
   input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 8, marginBottom: 10, zIndex: 1000 },
-  fileButton: { backgroundColor: "#0c4499", borderRadius: 5, padding: 12, justifyContent: "center", alignItems: "center", marginBottom: 10 },
-  sendButton: { backgroundColor: "#4CAF50", borderRadius: 5, padding: 12, justifyContent: "center", alignItems: "center" },
+  fileButton: { backgroundColor: "#8f8f8fff", borderRadius: 5, padding: 12, justifyContent: "center", alignItems: "center", marginBottom: 10 },
+  sendButton: { backgroundColor: "#0b4e91", borderRadius: 5, padding: 12, justifyContent: "center", alignItems: "center" },
   imagehH1: { width: 220, height: 80, marginBottom: 10 },
   menuBarContainer: { position: "absolute", bottom: 0, left: 0, right: 0, height: 70, borderTopWidth: 1, borderTopColor: "#ccc", zIndex: 1000, elevation: 10 },
   mainContainer: { flex: 1, margin: 10, padding: 10, borderRadius: 15, backgroundColor: "#ecececff" },

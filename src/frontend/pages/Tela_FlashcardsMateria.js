@@ -39,6 +39,10 @@ export default function FlashcardsMateria({ route, navigation }) {
   const alturaCardFechado = height * 0.2; 
   const alturaCardAberto = height * 0.5; 
 
+  const [flashcardToEdit, setFlashcardToEdit] = useState(null);
+  const [editFlashcardModalVisible, setEditFlashcardModalVisible] = useState(false);
+  const [deleteFlashcardModalVisible, setDeleteFlashcardModalVisible] = useState(false);
+
   // Carregar flashcards e modo intensivo do aluno
   useEffect(() => {
     async function carregarDados() {
@@ -90,6 +94,60 @@ export default function FlashcardsMateria({ route, navigation }) {
 
     carregarDados();
   }, [materia]);
+
+  // Abrir modal de edição
+  function openEditFlashcardModal(flashcard) {
+    setFlashcardToEdit(flashcard);
+    setEditFlashcardModalVisible(true);
+  }
+
+  // Confirmar edição
+  async function handleUpdateFlashcard() {
+    if (!flashcardToEdit) return;
+
+    try {
+      await FlashcardService.editarFlashcard(flashcardToEdit.id, {
+        pergunta: flashcardToEdit.pergunta,
+        resposta: flashcardToEdit.resposta,
+        materia: flashcardToEdit.materia,
+        repeticoes: flashcardToEdit.repeticoes,
+      });
+
+      const usuarioId = await FlashcardService.getUsuarioId();
+      const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
+      setFlashcards(flashcardsData.filter((fc) => fc.materia === materia));
+
+      setEditFlashcardModalVisible(false);
+      setFlashcardToEdit(null);
+    } catch (err) {
+      console.error("Erro ao atualizar flashcard:", err);
+      Alert.alert("Erro", "Não foi possível atualizar o flashcard.");
+    }
+  }
+
+  // Abrir modal de exclusão
+  function handleDeleteFlashcard(flashcard) {
+    setFlashcardToEdit(flashcard);
+    setDeleteFlashcardModalVisible(true);
+  }
+
+  // Confirmar exclusão
+  async function confirmDeleteFlashcard() {
+    if (!flashcardToEdit) return;
+
+    try {
+      await FlashcardService.deletarFlashcard(flashcardToEdit.id);
+      const usuarioId = await FlashcardService.getUsuarioId();
+      const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
+      setFlashcards(flashcardsData.filter((fc) => fc.materia === materia));
+
+      setDeleteFlashcardModalVisible(false);
+      setFlashcardToEdit(null);
+    } catch (err) {
+      console.error("Erro ao deletar flashcard:", err);
+      Alert.alert("Erro", "Não foi possível deletar o flashcard.");
+    }
+  }
 
   const handleAbrirFlashcard = async (item) => {
     const novoAberto = abertoId === item.id ? null : item.id;
@@ -147,6 +205,16 @@ export default function FlashcardsMateria({ route, navigation }) {
                 ? new Date(item.proxima_revisao).toLocaleDateString()
                 : "—"}
             </Text>
+
+            {/* Ícones de ação */}
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 8 }}>
+              <TouchableOpacity onPress={() => openEditFlashcardModal(item)} style={{ marginRight: 15 }}>
+                <MaterialIcons name="edit" size={22} color="#0b4e91" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDeleteFlashcard(item)}>
+                <MaterialIcons name="delete" size={22} color="#c62828" />
+              </TouchableOpacity>
+            </View>
           </>
         )}
       </TouchableOpacity>
@@ -198,7 +266,8 @@ export default function FlashcardsMateria({ route, navigation }) {
         await AlunoService.ativarModoIntensivo(alunoId, valor);
       }
 
-      if (valor && repeticoes < 6) setRepeticoes(6);
+      // Garantir que o estado de repeticoes acompanhe o modo intensivo
+      setRepeticoes((prev) => (valor && prev < 6 ? 6 : prev));
     } catch (err) {
       console.error("Erro ao atualizar modo intensivo:", err);
       Alert.alert(
@@ -274,7 +343,11 @@ export default function FlashcardsMateria({ route, navigation }) {
       {/* Botão flutuante */}
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          // Ajusta repeticoes ao abrir modal
+          setRepeticoes(modoIntensivo && repeticoes < 6 ? 6 : repeticoes);
+          setModalVisible(true);
+        }}
       >
         <MaterialIcons name="add" size={30} color="#fff" />
       </TouchableOpacity>
@@ -343,6 +416,83 @@ export default function FlashcardsMateria({ route, navigation }) {
         </View>
       </Modal>
 
+      {/* Modal de edição */}
+      <Modal
+        animationType="fade"
+        transparent
+        visible={editFlashcardModalVisible}
+        onRequestClose={() => setEditFlashcardModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Editar Flashcard</Text>
+              <TouchableOpacity onPress={() => setEditFlashcardModalVisible(false)}>
+                <MaterialIcons name="close" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.label}>Pergunta</Text>
+            <TextInput
+              style={styles.input}
+              value={flashcardToEdit?.pergunta || ""}
+              onChangeText={(t) => setFlashcardToEdit(prev => ({ ...prev, pergunta: t }))}
+            />
+
+            <Text style={styles.label}>Resposta</Text>
+            <TextInput
+              style={[styles.input, { height: 80 }]}
+              value={flashcardToEdit?.resposta || ""}
+              onChangeText={(t) => setFlashcardToEdit(prev => ({ ...prev, resposta: t }))}
+              multiline
+            />
+
+            <Text style={styles.label}>Repetições</Text>
+            <TextInput
+              style={styles.input}
+              value={String(flashcardToEdit?.repeticoes || 4)}
+              onChangeText={(t) => setFlashcardToEdit(prev => ({ ...prev, repeticoes: parseInt(t) || 4 }))}
+              keyboardType="numeric"
+            />
+
+            <TouchableOpacity style={styles.sendButton} onPress={handleUpdateFlashcard}>
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>Salvar alterações</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de exclusão */}
+      <Modal
+        visible={deleteFlashcardModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDeleteFlashcardModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Excluir flashcard?</Text>
+            <Text style={{ color: "#475569", marginTop: 6 }}>
+              Esta ação é <Text style={{ color: "#c62828", fontWeight: "700" }}>irreversível</Text> e removerá o flashcard.
+            </Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 16 }}>
+              <TouchableOpacity
+                onPress={() => setDeleteFlashcardModalVisible(false)}
+                style={[styles.sendButton, { backgroundColor: "#9e9e9e" }]}
+              >
+                <Text style={{ color: "#fff" }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmDeleteFlashcard}
+                style={[styles.sendButton, { backgroundColor: "#c62828" }]}
+              >
+                <Text style={{ color: "#fff" }}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.menuBarContainer}>
         <MenuBar />
       </View>
@@ -350,7 +500,6 @@ export default function FlashcardsMateria({ route, navigation }) {
   );
 }
 
-// 🔹 Estilos (mantidos iguais)
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#0b4e91ff" },
   whiteContainer: {
@@ -445,7 +594,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   sendButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#0b4e91",
     borderRadius: 5,
     padding: 12,
     justifyContent: "center",

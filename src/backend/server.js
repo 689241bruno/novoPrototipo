@@ -3,7 +3,9 @@ const cors = require("cors");
 const usuariosRoutes = require("./routes/usuariosRoutes");
 const alunoRoutes = require("./routes/AlunoRoutes");
 const materiaRoutes = require("./routes/MateriaRoutes");
-const flashcardRoutes = require("./routes/flashcardRoutes");
+const desafioRoutes = require("./routes/DesafioRoutes");
+const flashcardRoutes = require("./routes/FlashcardRoutes");
+const planoRoutes = require("./routes/PlanoDeEstudosRoutes")
 
 const app = express();
 app.use(cors());
@@ -15,8 +17,11 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Rotas
 app.use("/", usuariosRoutes);
-app.use("/", materiaRoutes);
 app.use("/", alunoRoutes);
+
+app.use("/", desafioRoutes);
+app.use("/", materiaRoutes);
+app.use("/", planoRoutes);
 app.use("/flashcards", flashcardRoutes);
 
 const PORT = process.env.PORT || 3000;
