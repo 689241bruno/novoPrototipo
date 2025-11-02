@@ -1,5 +1,9 @@
 class Notificacao {
-    constructor( id, destinatario, mensagem ) {
+    constructor( 
+        id, 
+        destinatario, 
+        mensagem 
+    ) {
         this.id = id;
         this.destinatario = destinatario;
         this.mensagem = mensagem;

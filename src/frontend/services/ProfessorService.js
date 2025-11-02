@@ -1,0 +1,20 @@
+import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = "http://localhost:3000"; // se for rodar no navegador -> http://localhost:3000
+
+class ProfessorService {
+    static async listarProfessores() {
+        return axios.get(`${API_URL}/professores`);
+    }
+
+    static async cadastrarProfessor(usuario_id, materia) {
+        return axios.post(`${API_URL}/cadprofessor`, { usuario_id, materia });
+    }
+
+    static async editarProfessor(usuario_id, dados) {
+        return axios.put(`${API_URL}/editprofessor/${usuario_id}`, dados);
+    }
+};
+
+export default ProfessorService;

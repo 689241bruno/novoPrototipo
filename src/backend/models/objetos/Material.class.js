@@ -1,7 +1,7 @@
 const pool = require("../../config/db");
 
 class Material {
-    constructor(id, materia, tema, titulo, arquivo, criado_por, progresso) {
+    constructor(id, materia, tema, titulo, arquivo, criado_por, concluida) {
         this.id = id;
         this.titulo = titulo;
         this.tema = tema;
@@ -19,8 +19,22 @@ class Material {
             row.materia,
             row.arquivo,
             row.criado_por,
-            row.progresso || 0
+            row.concluida || 0
         );
+    }
+
+    // Para Admins
+    static async listar() {
+        try {
+            console.log("[Material.listar] Executando SELECT * FROM material");
+            const [rows] = await pool.query("SELECT * FROM material");
+            console.log(`[Material.listar] ${rows.length} registros encontrados`);
+            console.table(rows); // Mostra todos os registros encontrados
+            return rows;
+        } catch (err) {
+            console.error("[Material.listar] Erro SQL:", err);
+            throw err;
+        }
     }
 
     static async listarMaterial(materia) {

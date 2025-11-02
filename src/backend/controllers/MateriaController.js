@@ -1,6 +1,18 @@
 const Material = require("../models/objetos/Material.class");
 const Professor = require("../models/usuarios/Professor.class");
 
+exports.listar = async (req, res) => {
+    console.log("[ROTA] GET /materias chamada");
+    try {
+        const materiais = await Material.listar();
+        console.log("[LISTAR] Materiais encontrados:", materiais.length);
+        res.json(materiais);
+    } catch (error) {
+        console.error("[ERRO LISTAR]", error);
+        res.status(500).send("Erro ao listar materiais didáticos!");
+    }
+};
+
 exports.listarMaterias = async (req, res) => {
     try {
         const materia = req.params.materia;

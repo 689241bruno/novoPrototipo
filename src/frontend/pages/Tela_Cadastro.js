@@ -42,17 +42,18 @@ export default function Signin() {
       setNome("");
       setEmail("");
       setSenha("");
-      alert("Usuário Cadastrado!");
+      alert("Usuário cadastrado com sucesso!");
       navigation.navigate("Login");
     } catch (error) {
-      if (err.response && err.response.status === 400) {
-        alert(err.response.data.mensagem);
+      if (error.response && error.response.status === 400) {
+        alert(error.response.data.mensagem);
       } else {
+        console.error("Erro ao cadastrar usuário:", error);
         alert("Erro inesperado ao cadastrar usuário!");
       }
     }
-  };
-
+  }
+  
   return (
     <Animatable.View
       animation={"fadeInUp"}

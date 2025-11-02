@@ -13,8 +13,16 @@ class UsuarioService {
       return null;
     }
   }
+
   static async cadastrarUsuario(nome, email, senha, is_aluno = 1, is_professor = 0, is_admin = 0) {
-    return axios.post(`${API_URL}/cadusuario`, { nome, email, senha, is_aluno, is_professor, is_admin });
+    return axios.post(`${API_URL}/cadusuario`, {
+      nome,
+      email,
+      senha,
+      is_aluno: Number(is_aluno),
+      is_professor: Number(is_professor),
+      is_admin: Number(is_admin)
+    });
   }
 
   static async loginUsuario(email, senha) {

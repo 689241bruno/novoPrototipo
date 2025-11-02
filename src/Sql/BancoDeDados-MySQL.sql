@@ -15,10 +15,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS professores(
     usuario_id INT PRIMARY KEY,
-    usuario_email VARCHAR(255),
     materia VARCHAR(150),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (usuario_email) REFERENCES usuarios(email) ON DELETE CASCADE
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS admin(

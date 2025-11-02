@@ -2,6 +2,10 @@ import axios from "axios";
 const API_URL = "http://localhost:3000"; // se for rodar no navegador -> http://localhost:3000
 
 class MateriaService {
+    static async listar() {
+        return axios.get(`${API_URL}/materias`);
+    }
+
     static async listarMaterias(materia, idUsuario) {
         return axios.get(`${API_URL}/materias/${encodeURIComponent(materia)}`, {
             params: { idUsuario },

@@ -65,12 +65,49 @@ class Usuario {
   }
 
   static async editar(id, dados) {
-    const { nome, email, senha } = dados;
-    await pool.query(
-      "UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?",
-      [nome, email, senha, id]
-    );
-    return true;
+    try {
+      let campos = [];
+      let valores = [];
+
+      if (dados.nome) {
+        campos.push("nome = ?");
+        valores.push(dados.nome);
+      }
+
+      if (dados.email) {
+        campos.push("email = ?");
+        valores.push(dados.email);
+      }
+
+      if (dados.senha) {
+        campos.push("senha = ?");
+        valores.push(dados.senha);
+      }
+
+      if (campos.length === 0) return;
+
+      // Busca o usuário atual antes de atualizar
+      const [usuarioAtual] = await pool.query("SELECT * FROM usuarios WHERE id = ?", [id]);
+      if (usuarioAtual.length === 0) throw new Error("Usuário não encontrado.");
+
+      const emailAntigo = usuarioAtual[0].email;
+
+      // Verifica se é admin
+      const [ehAdmin] = await pool.query("SELECT * FROM admin WHERE usuario_email = ?", [emailAntigo]);
+
+      // Impede alterar email de admin (mas permite editar nome)
+      if (ehAdmin.length > 0 && dados.email && dados.email !== emailAntigo) {
+        throw new Error("Não é permitido alterar o email de um administrador, pois é chave estrangeira.");
+      }
+
+      const sql = `UPDATE usuarios SET ${campos.join(", ")} WHERE id = ?`;
+      valores.push(id);
+
+      await pool.query(sql, valores);
+    } catch (err) {
+      console.error("Erro ao editar usuário:", err);
+      throw err;
+    }
   }
 
   static async deletar(id) {

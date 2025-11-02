@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const usuariosRoutes = require("./routes/usuariosRoutes");
 const alunoRoutes = require("./routes/AlunoRoutes");
+const professorRoutes = require("./routes/ProfessorRoutes");
+const adminRoutes = require("./routes/AdminRoutes");
 const materiaRoutes = require("./routes/MateriaRoutes");
 const desafioRoutes = require("./routes/DesafioRoutes");
 const flashcardRoutes = require("./routes/FlashcardRoutes");
@@ -18,6 +20,8 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // Rotas
 app.use("/", usuariosRoutes);
 app.use("/", alunoRoutes);
+app.use("/", professorRoutes);
+app.use("/", adminRoutes);
 
 app.use("/", desafioRoutes);
 app.use("/", materiaRoutes);

@@ -12,6 +12,7 @@ import Flashcard from "../pages/Tela_Flashcards.js";
 import FlashcardsMateria from "../pages/Tela_FlashcardsMateria.js";
 import Ranking from "../pages/Tela_Ranking.js";
 import Configuracoes from "../pages/Tela_Configuracoes.js";
+import PainelControle from "../pages/Tela_PainelDeControle.js"
 
 // Telas de recuperação de senha
 import EsqueciSenha from "../pages/Tela_login/Tela_esqueci_senha.js";
@@ -96,6 +97,12 @@ export default function Routes() {
       <Stack.Screen
         name="Configuracoes"
         component={Configuracoes}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="PainelControle"
+        component={PainelControle}
         options={{ headerShown: false }}
       />
 

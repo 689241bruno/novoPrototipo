@@ -122,7 +122,7 @@ export default function Home() {
                 delayanim={480}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("CienciasNatureza", { materia: "CienciasNatureza" })}>
+            <Pressable onPress={() => navigation.navigate("CienciasNatureza", { materia: "Ciencias da Natureza" })}>
               <ContainerMateria
                 titulo="Ciências da Natureza"
                 nomeImage="CiênciasdaNatureza"
@@ -130,7 +130,7 @@ export default function Home() {
                 delayanim={560}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("CienciasHumanas", { materia: "CienciasHumanas" })}>
+            <Pressable onPress={() => navigation.navigate("CienciasHumanas", { materia: "Ciencias Humanas" })}>
               <ContainerMateria
                 titulo="Ciências Humanas"
                 nomeImage="CiênciasHumanas"
