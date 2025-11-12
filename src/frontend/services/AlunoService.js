@@ -36,6 +36,14 @@ class AlunoService {
     static async checkRanking(usuario_id) {
         return axios.get(`${API_URL}/alunos/ranking/${usuario_id}`);
     }
+
+    static async addXp(usuario_id, xp) {
+        return axios.put(
+            `${API_URL}/alunos/addxp/${usuario_id}`,
+            { xp: Number(xp) },
+            { headers: { "Content-Type": "application/json" } }
+        );
+    }
 }
 
 export default AlunoService;

@@ -11,6 +11,7 @@ import {
     Dimensions,
     FlatList,
 } from 'react-native';
+import * as Animatable from "react-native-animatable";
 import TopNavbar from "../components/TopNavbar";
 import MenuBar from "../components/MenuBar";
 import ProgressBar from '../components/ProgressBar';
@@ -413,13 +414,20 @@ export default function Tela_PlanoDeEstudos() {
         setModalVisible(true);
     }
 
-    
-
     return (
         <SafeAreaView style={styles.safeArea}>
-            <TopNavbar />
+            {/* Header */}
+            <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+                    <TopNavbar />
+                </SafeAreaView>
+            </Animatable.View>
 
-            <View style={styles.whiteContainer}>
+            <Animatable.View 
+                delay={300}
+                animation={"fadeInUp"}
+                style={styles.whiteContainer}
+            >
                 <View style={styles.toggleRow}>
                     <TouchableOpacity style={[styles.toggleButton, mode === 'dias' && styles.toggleButtonActive]} onPress={() => setMode('dias')}>
                         <Text style={[styles.toggleText, mode === 'dias' && styles.toggleTextActive]}>Dias da Semana</Text>
@@ -698,7 +706,7 @@ export default function Tela_PlanoDeEstudos() {
                     </View>
                 </Modal>
 
-            </View>
+            </Animatable.View>
 
             <View style={styles.menuBarContainer}>
                 <MenuBar />
@@ -709,7 +717,8 @@ export default function Tela_PlanoDeEstudos() {
 
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#0b4e91' },
-    whiteContainer: { flex: 1, margin: 10, backgroundColor: '#ececec', borderRadius: 14, padding: 12 },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
+    whiteContainer: { flex: 1, margin: 20, backgroundColor: '#ececec', borderRadius: 14, padding: 12 },
     toggleRow: { flexDirection: 'row', marginBottom: 12, alignSelf: 'center' },
     toggleButton: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, marginHorizontal: 6, backgroundColor: '#fff' },
     toggleButtonActive: { backgroundColor: '#0b4e91' },

@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     Dimensions,
 } from 'react-native';
+import * as Animatable from "react-native-animatable";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TopNavbar from "../components/TopNavbar";
 import MenuBar from "../components/MenuBar";
@@ -49,7 +50,13 @@ export default function Tela_Desafios() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <TopNavbar />
+            {/* Header */}
+            <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+                    <TopNavbar />
+                </SafeAreaView>
+            </Animatable.View>
+
             <View style={styles.whiteContainer}>
                 <Text style={styles.headerTitle}>Desafios Semanais</Text>
                 <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -89,6 +96,7 @@ export default function Tela_Desafios() {
 
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#0b4e91' },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
     whiteContainer: {
         flex: 1,
         backgroundColor: '#ececec',

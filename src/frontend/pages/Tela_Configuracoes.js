@@ -9,6 +9,7 @@ import {
     ScrollView,
     TouchableWithoutFeedback,
 } from 'react-native';
+import * as Animatable from "react-native-animatable";
 import TopNavbar from "../components/TopNavbar";
 import MenuBar from "../components/MenuBar";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -83,7 +84,12 @@ export default function Tela_Configuracoes() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <TopNavbar />
+            {/* Header */}
+            <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+                    <TopNavbar />
+                </SafeAreaView>
+            </Animatable.View>
 
             <ScrollView
                 style={styles.scrollContainer}
@@ -150,6 +156,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#0b4e91',
     },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
     scrollContainer: {
         flex: 1,
     },

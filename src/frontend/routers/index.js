@@ -19,11 +19,8 @@ import EsqueciSenha from "../pages/Tela_login/Tela_esqueci_senha.js";
 import CodigoVerificacao from "../pages/Tela_login/Tela_codigo_verificacao.js";
 
 // Páginas de matérias
-import CienciasHumanas from "../pages/materias/Tela_CienciasHumanas.js";
-import CienciasNatureza from "../pages/materias/Tela_CienciasNatureza.js";
-import Linguagens from "../pages/materias/Tela_Linguagens.js";
-import Matematica from "../pages/materias/Tela_Matematica.js";
-import TelaPDF from "../pages/materias/TelaPDF.js";
+import Materia from "../pages/Tela_Materia.js";
+import TelaPDF from "../pages/TelaPDF.js";
 
 // Outros
 import Teste from "../Testes_de_componentes/index.js";
@@ -119,26 +116,8 @@ export default function Routes() {
       />
 
       <Stack.Screen
-        name="CienciasHumanas"
-        component={CienciasHumanas}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="CienciasNatureza"
-        component={CienciasNatureza}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="Linguagens"
-        component={Linguagens}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="Matematica"
-        component={Matematica}
+        name="Materia"
+        component={Materia}
         options={{ headerShown: false }}
       />
 

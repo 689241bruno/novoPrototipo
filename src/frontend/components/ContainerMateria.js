@@ -32,14 +32,14 @@ export default function ContainerMateria(props) {
         </View>
       </View>
       <View style={styles.secaoSecundaria}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", color: "#565656" }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold", color: "#565656", marginLeft: 30 }}>
           {progresso}%
         </Text>
         <Progress.Bar
           progress={props.progress}
           height={15}
           color="green"
-          style={{ borderColor: "gray", width: 330 }}
+          style={styles.progressBarStyle}
           animationType="spring"
           animated={true}
         />
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   secaoSecundaria: {
     alignSelf: "center",
     height: "30%",
-    width: 330,
+    width: "100%",
     borderRadius: 14,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -116,6 +116,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingRight: 15,
+    marginHorizontal: 30,
     gap: 20,
   },
+
+  progressBarStyle: {
+      flex: 1, 
+      borderColor: "gray",
+      marginRight: 27,
+  }
 });

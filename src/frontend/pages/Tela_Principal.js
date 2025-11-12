@@ -92,7 +92,7 @@ export default function Home() {
   );
 
   return (
-    <SafeAreaView style={styles.conatiner}>
+    <SafeAreaView style={styles.container}>
       <Animatable.View delay={300} animation={"fadeInDown"} style={styles.header}>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
           <TopNavbar />
@@ -106,7 +106,7 @@ export default function Home() {
           </View>
         ) : (
           <>
-            <Pressable onPress={() => navigation.navigate("Linguagens", { materia: "Linguagens" })}>
+            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Linguagens" })}>
               <ContainerMateria
                 titulo="Linguagens"
                 nomeImage="Linguagens"
@@ -114,7 +114,7 @@ export default function Home() {
                 delayanim={400}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("Matematica", { materia: "Matematica" })}>
+            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Matematica" })}>
               <ContainerMateria
                 titulo="Matemática"
                 nomeImage="Matemática"
@@ -122,7 +122,7 @@ export default function Home() {
                 delayanim={480}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("CienciasNatureza", { materia: "Ciencias da Natureza" })}>
+            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Ciencias da Natureza" })}>
               <ContainerMateria
                 titulo="Ciências da Natureza"
                 nomeImage="CiênciasdaNatureza"
@@ -130,7 +130,7 @@ export default function Home() {
                 delayanim={560}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("CienciasHumanas", { materia: "Ciencias Humanas" })}>
+            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Ciencias Humanas" })}>
               <ContainerMateria
                 titulo="Ciências Humanas"
                 nomeImage="CiênciasHumanas"
@@ -150,8 +150,8 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  conatiner: { flex: 1, backgroundColor: "#338BE5" },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 15, paddingVertical: 5, backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
-  main: { padding: 30, paddingTop: 30, marginBottom: 60, display: "flex", flexDirection: "column" },
+  container: { flex: 1, backgroundColor: "#0b4e91" },
+  header: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
+  main: { padding: 20, paddingTop: 20, marginBottom: 60, display: "flex", flexDirection: "column" },
   footer: { height: 90 },
 });

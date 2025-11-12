@@ -97,3 +97,24 @@ exports.checkRanking = async (req, res) => {
         res.status(500).json({ erro: "Erro ao verificar ranking." });
     }
 };
+
+exports.addXp = async (req, res) => {
+    try {
+        const { usuario_id } = req.params;
+        const { xp } = req.body;
+
+        if (!xp || isNaN(xp)) {
+            return res.status(400).json({ message: "XP inválido." });
+        }
+
+        const resultado = await Aluno.addXp(usuario_id, xp);
+
+        return res.status(200).json({
+            message: "XP adicionado com sucesso!",
+            novoXp: resultado.xp,
+        });
+    } catch (err) {
+        console.error("Erro no controller ao adicionar XP:", err);
+        return res.status(500).json({ message: "Erro interno ao adicionar XP." });
+    }
+};

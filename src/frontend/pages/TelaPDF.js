@@ -3,12 +3,12 @@ import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Dimensions, Ima
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
-import UsuarioService from '../../services/UsuarioService';
-import MaterialService from '../../services/MaterialService';
+import UsuarioService from '../services/UsuarioService';
+import MaterialService from '../services/MaterialService';
 import * as Animatable from "react-native-animatable";
-import ContainerMateria from "../../components/ContainerMateria";
-import MenuBar from "../../components/MenuBar";
-import TopNavbar from "../../components/TopNavbar"; 
+import ContainerMateria from "../components/ContainerMateria";
+import MenuBar from "../components/MenuBar";
+import TopNavbar from "../components/TopNavbar"; 
 
 import Constants from "expo-constants";
 
@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
     header: {
         width: "100%",
         height: 80,
-        paddingHorizontal: 15,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",

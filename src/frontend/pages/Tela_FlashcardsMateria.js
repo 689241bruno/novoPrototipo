@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,10 @@ import {
   Modal,
   Dimensions,
   Switch,
+  Animated, 
+  Easing,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
@@ -21,6 +24,93 @@ import TopNavbar from "../components/TopNavbar";
 import MenuBar from "../components/MenuBar";
 import FlashcardService from "../services/FlashcardService";
 import AlunoService from "../services/AlunoService";
+
+const FlashcardItem = ({ item, aberto, onToggle, openEdit, onDelete }) => {
+  const alturaFechada = 120;
+  const animHeight = useRef(new Animated.Value(alturaFechada)).current;
+  const [conteudoAltura, setConteudoAltura] = useState(0);
+  const easingFn = Easing.bezier(0.25, 0.1, 0.25, 1);
+
+  useEffect(() => {
+    const alturaFinal = aberto ? conteudoAltura + 60 : alturaFechada; // +60 para margem/padding
+    Animated.timing(animHeight, {
+      toValue: alturaFinal,
+      duration: 300,
+      easing: easingFn,
+      useNativeDriver: false,
+    }).start();
+  }, [aberto, conteudoAltura]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.card,
+        { height: animHeight },
+        aberto && styles.cardAberto,
+      ]}
+    >
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => onToggle(item)}
+        style={{ flex: 1 }}
+      >
+        <View
+          onLayout={(e) => {
+            if (!aberto) return;
+            const altura = e.nativeEvent.layout.height;
+            if (altura > conteudoAltura) setConteudoAltura(altura);
+          }}
+        >
+          <Text style={styles.label}>Pergunta:</Text>
+          <Text
+            style={styles.text}
+            numberOfLines={aberto ? undefined : 3}
+            ellipsizeMode="tail"
+          >
+            {item.pergunta}
+          </Text>
+
+          {aberto && (
+            <View style={{ marginTop: 10 }}>
+              <Text style={styles.label}>Resposta:</Text>
+              <Text style={styles.text}>{item.resposta}</Text>
+              <Text style={styles.info}>
+                Última revisão:{" "}
+                {item.ultima_revisao
+                  ? new Date(item.ultima_revisao).toLocaleDateString()
+                  : "—"}
+              </Text>
+              <Text style={styles.info}>
+                Próxima revisão:{" "}
+                {item.proxima_revisao
+                  ? new Date(item.proxima_revisao).toLocaleDateString()
+                  : "—"}
+              </Text>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  marginTop: 8,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => openEdit(item)}
+                  style={{ marginRight: 15 }}
+                >
+                  <MaterialIcons name="edit" size={22} color="#0b4e91" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => onDelete(item)}>
+                  <MaterialIcons name="delete" size={22} color="#c62828" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 export default function FlashcardsMateria({ route, navigation }) {
   const { materia } = route.params;
@@ -150,75 +240,35 @@ export default function FlashcardsMateria({ route, navigation }) {
   }
 
   const handleAbrirFlashcard = async (item) => {
-    const novoAberto = abertoId === item.id ? null : item.id;
-    setAbertoId(novoAberto);
+    try {
+      // alternar abertura visual
+      setAbertoId((prev) => (prev === item.id ? null : item.id));
 
-    if (novoAberto) {
-      await revisarFlashcard(item.id);
+      // chamar revisão no backend
+      const atualizado = await FlashcardService.revisarFlashcard(item.id);
+      console.log("Retorno do revisarFlashcard:", atualizado);
+
+      // atualizar flashcards no estado local
+      setFlashcards((prev) =>
+        prev.map((fc) =>
+          fc.id === item.id
+            ? {
+                ...fc,
+                ultima_revisao:
+                  atualizado?.ultima_revisao ||
+                  atualizado?.ultimaRevisao ||
+                  new Date().toISOString(),
+                proxima_revisao:
+                  atualizado?.proxima_revisao ||
+                  atualizado?.proximaRevisao ||
+                  new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+              }
+            : fc
+        )
+      );
+    } catch (err) {
+      console.error("Erro ao revisar flashcard:", err);
     }
-  };
-
-  const renderFlashcard = ({ item }) => {
-    const aberto = abertoId === item.id;
-
-    // Largura responsiva:
-    const breakpoint = 500;
-    const larguraCard =
-      width < breakpoint ? (width - 3 * 15) / 2 : width - 2 * 15;
-
-    return (
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => handleAbrirFlashcard(item)}
-        style={[
-          styles.card,
-          {
-            width: larguraCard,
-            minHeight: aberto ? alturaCardAberto : alturaCardFechado,
-            maxHeight: aberto ? alturaCardAberto : alturaCardFechado,
-          },
-        ]}
-      >
-        <Text style={styles.label}>Pergunta:</Text>
-        <Text
-          style={styles.text}
-          numberOfLines={aberto ? undefined : 3} // limita a 3 linhas quando fechado
-          ellipsizeMode="tail" // adiciona "..."
-        >
-          {item.pergunta}
-        </Text>
-
-        {aberto && (
-          <>
-            <Text style={styles.label}>Resposta:</Text>
-            <Text style={styles.text}>{item.resposta}</Text>
-
-            <Text style={styles.info}>
-              Última revisão:{" "}
-              {item.ultima_revisao
-                ? new Date(item.ultima_revisao).toLocaleDateString()
-                : "—"}
-            </Text>
-            <Text style={styles.info}>
-              Próxima revisão:{" "}
-              {item.proxima_revisao
-                ? new Date(item.proxima_revisao).toLocaleDateString()
-                : "—"}
-            </Text>
-
-            {/* Ícones de ação */}
-            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 8 }}>
-              <TouchableOpacity onPress={() => openEditFlashcardModal(item)} style={{ marginRight: 15 }}>
-                <MaterialIcons name="edit" size={22} color="#0b4e91" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteFlashcard(item)}>
-                <MaterialIcons name="delete" size={22} color="#c62828" />
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-      </TouchableOpacity>
-    );
   };
 
   // Criar novo flashcard
@@ -285,9 +335,6 @@ export default function FlashcardsMateria({ route, navigation }) {
   const revisarFlashcard = async (id) => {
     try {
       await FlashcardService.revisarFlashcard(id);
-      const usuarioId = await FlashcardService.getUsuarioId();
-      const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
-      setFlashcards(flashcardsData.filter((fc) => fc.materia === materia));
     } catch (err) {
       console.error("Erro ao revisar flashcard:", err);
       Alert.alert(
@@ -313,7 +360,12 @@ export default function FlashcardsMateria({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TopNavbar />
+      {/* Header */}
+      <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+          <TopNavbar />
+        </SafeAreaView>
+      </Animatable.View>
       <View style={styles.whiteContainer}>
         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -334,7 +386,16 @@ export default function FlashcardsMateria({ route, navigation }) {
             </Text>
           ) : (
             <View style={styles.cardsContainer}>
-              {flashcards.map((item) => renderFlashcard({ item }))}
+              {flashcards.map((item) => (
+                <FlashcardItem
+                  key={item.id}
+                  item={item}
+                  aberto={abertoId === item.id}
+                  onToggle={handleAbrirFlashcard}
+                  openEdit={openEditFlashcardModal}
+                  onDelete={handleDeleteFlashcard}
+                />
+              ))}
             </View>
           )}
         </ScrollView>
@@ -502,6 +563,7 @@ export default function FlashcardsMateria({ route, navigation }) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#0b4e91ff" },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
   whiteContainer: {
     flex: 1,
     backgroundColor: "#ececec",
@@ -517,17 +579,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   listContainer: { width: "100%", alignItems: "center" },
-  card: {
-    width: "100%",
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
   label: { fontWeight: "bold", color: "#40739e", marginBottom: 3 },
   text: { marginBottom: 10, color: "#2f3640" },
   info: { fontSize: 12, color: "#718093", marginBottom: 5 },
@@ -612,37 +663,36 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   cardsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
+    alignItems: "center",
+    width: "100%",
   },
   card: {
-    margin: 5,
     backgroundColor: "#fff",
     borderRadius: 15,
     padding: 15,
+    marginVertical: 8,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
-    justifyContent: "flex-start",
-    minWidth: 100,
-    maxWidth: 200,
-    flexGrow: 1,
-  },
-  cardFechado: {
-    minHeight: 80,  
-    maxHeight: 80,  
-    backgroundColor: "#fff",
+    overflow: "hidden",
+    width: Dimensions.get("window").width * 0.85, // largura responsiva e centralizada
+    alignSelf: "center",
   },
   cardAberto: {
     backgroundColor: "#f9f9f9",
-    minHeight: 80,
-    maxHeight: 80,
+  },
+  respostaContainer: {
+    marginTop: 10,
+    maxHeight: Dimensions.get("window").height * 0.35,
+  },
+  respostaContainer: {
+    marginTop: 10,
+    maxHeight: Dimensions.get("window").height * 0.45, // limita altura do conteúdo
   },
   text: {
     marginBottom: 10,
     color: "#2f3640",
-    flexShrink: 1,
-  }
+    fontSize: 15,
+  },
 });

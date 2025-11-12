@@ -79,16 +79,26 @@ class Aluno extends Usuario {
         return rows[0] || null;
     }
 
-    // Métodos de instância — se for usar no futuro
-    enviarRedacao(redacao) {
-        this.redacoes.push(redacao);
-        return true;
-    }
+    static async addXp(usuario_id, xp) {
+        try {
+            // Atualiza o XP
+            await connection.query(
+                "UPDATE alunos SET xp = xp + ? WHERE usuario_id = ?",
+                [xp, usuario_id]
+            );
 
-    criarFlashcard(flashcard) {
-        this.flashcards.push(flashcard);
-        return true;
-    }
+            // Retorna o XP atualizado
+            const [rows] = await connection.query(
+                "SELECT xp FROM alunos WHERE usuario_id = ?",
+                [usuario_id]
+            );
+
+            return rows[0]; // { xp: valorAtualizado }
+        } catch (err) {
+            console.error("Erro ao adicionar XP:", err);
+            throw new Error("Erro interno ao adicionar XP.");
+        }
+    }   
 }
 
 module.exports = Aluno;

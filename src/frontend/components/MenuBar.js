@@ -6,8 +6,8 @@ const imagens = {
   PlanoEstudos: require("../assets/PlanoEstudos_Icon.png"),
   Flashcards: require("../assets/Flashcards_Icon.png"),
   Home: require("../assets/Home_Icon.png"),
+  Desafios: require("../assets/Conquests_Icon.png"),
   Ranking: require("../assets/Ranking_Icon.png"),
-  Config: require("../assets/Config_Icon.png"),
 };
 
 export default function MenuBar() {
@@ -30,11 +30,11 @@ export default function MenuBar() {
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={styles.botao}
+            style={styles.botaoMaior}
             onPress={() => navigation.navigate("Flashcard")}
           >
             <Image
-              style={styles.icon}
+              style={styles.iconMaior}
               source={imagens.Flashcards}
               resizeMode="contain"
             />
@@ -58,23 +58,23 @@ export default function MenuBar() {
         {/* Lado direito */}
         <View style={styles.section}>
           <TouchableOpacity 
-            style={styles.botao}
-            onPress={() => navigation.navigate("Ranking")}
+            style={styles.botaoMaior}
+            onPress={() => navigation.navigate("Desafios")}
           >
             <Image
-              style={styles.icon}
-              source={imagens.Ranking}
+              style={styles.iconMaior}
+              source={imagens.Desafios}
               resizeMode="contain"
             />
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.botao}
-            onPress={() => navigation.navigate("Configuracoes")}
+            onPress={() => navigation.navigate("Ranking")}
           >
             <Image
               style={styles.icon}
-              source={imagens.Config}
+              source={imagens.Ranking}
               resizeMode="contain"
             />
           </TouchableOpacity>
@@ -126,6 +126,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  botaoMaior: {
+    height: 55,
+    width: 55,
+    elevation: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   botaoMeio: {
     height: 70,
     width: 70,
@@ -138,6 +145,10 @@ const styles = StyleSheet.create({
   icon: {
     height: 40,
     width: 40,
+  },
+  iconMaior: {
+    height: 50,
+    width: 50,
   },
   iconMeio: {
     height: 50,

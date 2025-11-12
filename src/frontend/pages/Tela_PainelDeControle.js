@@ -15,6 +15,7 @@ import {
     Switch,
     KeyboardAvoidingView
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import Checkbox from "expo-checkbox";
 import DropDownPicker from "react-native-dropdown-picker";
 import * as DocumentPicker from 'expo-document-picker';
@@ -812,7 +813,12 @@ export default function Tela_PainelControle() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <TopNavbar />
+            {/* Header */}
+            <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+                    <TopNavbar />
+                </SafeAreaView>
+            </Animatable.View>
 
             <View style={styles.container}>
                 {/* Sidebar animada */}
@@ -1364,6 +1370,7 @@ export default function Tela_PainelControle() {
 
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: "#0b4e91" },
+    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
     container: { flex: 1, flexDirection: "row", backgroundColor: "#f4f6fa" },
 
     sidebar: {

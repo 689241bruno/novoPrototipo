@@ -1,5 +1,6 @@
 const Usuario = require("../models/usuarios/Usuario.class");
 const Aluno = require("../models/usuarios/Aluno.class");
+const pool = require("../config/db");
 
 // Lista todos os usuários
 exports.listarUsuarios = async (req, res) => {
@@ -83,29 +84,29 @@ exports.login = async (req, res) => {
 
 // Editar 
 exports.editarUsuario = async (req, res) => {
-    const { id, dados } = req.body; // remover "materia"
-    const pool = require("../config/db");
-    const connection = await pool.getConnection();
+    const { id, nome, cor, foto } = req.body; // <-- inclui foto direto do JSON
 
     try {
-        // Busca o usuário para conferir existência
-        const [rows] = await connection.query(
-            "SELECT id FROM usuarios WHERE id = ?",
-            [id]
-        );
-        if (rows.length === 0) throw new Error("Usuário não encontrado.");
+        console.log("📦 Dados recebidos para edição:", { id, nome, cor, temFoto: !!foto });
 
-        // Atualiza apenas a tabela usuarios
-        await Usuario.editar(id, dados);
+        let fotoBuffer = null;
+        if (foto && foto.startsWith("data:image")) {
+        // converte base64 para buffer
+        const base64Data = foto.split(",")[1];
+        fotoBuffer = Buffer.from(base64Data, "base64");
+        }
 
-        connection.release();
-        res.json({ mensagem: "Usuário atualizado com sucesso!" });
+        const usuarioAtualizado = await Usuario.editar(id, { nome, cor, foto: fotoBuffer });
+        res.json({
+        mensagem: "Usuário atualizado com sucesso!",
+        usuario: usuarioAtualizado
+        });
     } catch (err) {
-        connection.release();
         console.error("Erro ao editar usuário:", err);
         res.status(500).json({ erro: "Erro ao editar usuário!" });
     }
 };
+
 
 // Deletar
 exports.deletarUsuario = async (req, res) => {
@@ -120,7 +121,7 @@ exports.deletarUsuario = async (req, res) => {
 };
 
 // Verificar tipo de usuário
-exports.verficarTipo = async (req, res) => {
+exports.verificarTipo = async (req, res) => {
     const { email } = req.query;
 
     try {
@@ -182,6 +183,22 @@ exports.recuperarSenha = async (req, res) => {
     } catch (error) {
         console.error("Erro no recuperar senha: ", error);
         res.status(500).json({ erro: "Erro no servidor ao recuperar senha!" });
+    }
+};
+
+exports.buscarPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const usuario = await Usuario.buscarPorId(id);
+
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        return res.json(usuario);
+    } catch (err) {
+        console.error("Erro no controller ao buscar usuário:", err);
+        return res.status(500).json({ message: "Erro interno ao buscar usuário." });
     }
 };
 
