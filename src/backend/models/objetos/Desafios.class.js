@@ -1,10 +1,20 @@
 const pool = require("../../config/db");
 
 class Desafios {
-    constructor( id, titulo, descricao, xp, img) {
+    constructor( 
+        id,
+        titulo, 
+        descricao, 
+        materia, 
+        quantidade,
+        xp, 
+        img
+    ) {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
+        this.materia = materia;
+        this.quantidade = quantidade;
         this.xp = xp;
         this.img = img;
     }
@@ -16,20 +26,26 @@ class Desafios {
     }
 
     // Criar desafio
-    static async criar({ titulo, descricao, xp, img }) {
+    static async criar({ titulo, descricao, materia, quantidade, xp, img }) {
         const [result] = await pool.query(
-            "INSERT INTO desafios (titulo, descricao, xp, img) VALUES (?, ?, ?, ?)",
-            [titulo, descricao, xp, img]
+            "INSERT INTO desafios (titulo, descricao, materia, quantidade, xp, img) VALUES (?, ?, ?, ?, ?, ?)",
+            [titulo, descricao, materia, quantidade, xp, img]
         );
         return result.insertId;
     }
 
     // Editar desafio
     static async editar(id, dados) {
-        const { titulo, descricao, xp, img } = dados;
+        const titulo = dados.titulo;
+        const descricao = dados.descricao;
+        const materia = dados.materia ?? null;
+        const quantidade = dados.quantidade ?? null;
+        const xp = dados.xp;
+        const img = dados.img ?? null;
+        
         await pool.query(
-            "UPDATE desafios SET titulo = ?, descricao = ?, xp = ?, img = ? WHERE id = ?",
-            [titulo, descricao, xp, img, id]
+            "UPDATE desafios SET titulo = ?, descricao = ?, materia = ?, quantidade = ?, xp = ?, img = ? WHERE id = ?",
+            [titulo, descricao, materia, quantidade, xp, img, id]
         );
         return true;
     }

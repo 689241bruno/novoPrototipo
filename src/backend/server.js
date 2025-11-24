@@ -4,10 +4,13 @@ const usuariosRoutes = require("./routes/usuariosRoutes");
 const alunoRoutes = require("./routes/AlunoRoutes");
 const professorRoutes = require("./routes/ProfessorRoutes");
 const adminRoutes = require("./routes/AdminRoutes");
+const notificacaoRoutes = require("./routes/NotificacaoRoutes");
 const materiaRoutes = require("./routes/MateriaRoutes");
 const desafioRoutes = require("./routes/DesafioRoutes");
 const flashcardRoutes = require("./routes/FlashcardRoutes");
-const planoRoutes = require("./routes/PlanoDeEstudosRoutes")
+const planoRoutes = require("./routes/PlanoDeEstudosRoutes");
+const questaoRoutes = require("./routes/QuestaoRoutes");
+const RedacaoRoutes = require("./routes/RedacaoRoutes");
 
 const app = express();
 app.use(cors());
@@ -22,10 +25,16 @@ app.use("/alunos", alunoRoutes);
 app.use("/", professorRoutes);
 app.use("/", adminRoutes);
 
-app.use("/", desafioRoutes);
+app.use("/notificacoes", notificacaoRoutes);
+
+app.use("/redacao", RedacaoRoutes);
+
+app.use("/desafios", desafioRoutes);  
 app.use("/", materiaRoutes);
 app.use("/", planoRoutes);
 app.use("/flashcards", flashcardRoutes);
+
+app.use("/questoes", questaoRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

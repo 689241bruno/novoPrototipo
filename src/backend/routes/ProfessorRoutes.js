@@ -7,4 +7,7 @@ router.post("/cadprofessor", professorController.cadastrarProfessor);
 router.put("/editprofessor/:id", professorController.editarProfessor);
 router.delete("/delprofessor/:usuario_id", professorController.deletarProfessor);
 
+router.put("/materiais/:id", professorController.editarMaterial);
+router.delete("/materiais/:id", professorController.deletarMaterial);
+
 module.exports = router;

@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     elevation: 4,
-    backgroundColor: "#fff",
+    backgroundColor: "#eef9ffff",
   },
   iconButton: {
     height: 65,

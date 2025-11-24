@@ -4,34 +4,41 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const API_URL = "http://localhost:3000"; // ajuste se necessário
 
 class DesafiosService {
-
     static async listarDesafios() {
-        try {
-            const usuario = await AsyncStorage.getItem("usuario");
-            const usuario_id = usuario ? JSON.parse(usuario).id : null;
-            const response = await axios.get(`${API_URL}/desafios/progresso/${usuario_id}`);
-            return response.data;
-        } catch (err) {
-            console.error("Erro ao listar desafios:", err);
-            return [];
-        }
+        return axios.get(`${API_URL}/desafios`);
+    }
+
+    static async criarDesafio(dados) {
+        return axios.post(`${API_URL}/desafios`, dados);
+    }
+
+    static async editarDesafio(id, dados) {
+        return axios.put(`${API_URL}/desafios/${id}`, dados);
+    }
+
+    static async deletarDesafio(id) {
+        return axios.delete(`${API_URL}/desafios/${id}`);
     }
 
     static async registrarProgresso(usuario_id, desafio_id, progresso, concluida) {
-        try {
-            await axios.post(`${API_URL}/desafios/progresso`, { usuario_id, desafio_id, progresso, concluida });
-        } catch (err) {
-            console.error("Erro ao registrar progresso:", err);
-        }
+        return axios.post(`${API_URL}/desafios/progresso`, {
+            usuario_id,
+            desafio_id,
+            progresso,
+            concluida
+        });
+    }
+
+    static async listarProgressoUsuario(usuario_id) {
+        return axios.get(`${API_URL}/desafios/progresso/${usuario_id}`);
     }
 
     static async marcarConcluido(usuario_id, desafio_id) {
-        try {
-            await axios.put(`${API_URL}/desafios/progresso/concluido`, { usuario_id, desafio_id });
-        } catch (err) {
-            console.error("Erro ao marcar desafio concluído:", err);
-        }
+        return axios.put(`${API_URL}/desafios/progresso/concluido`, {
+            usuario_id,
+            desafio_id
+        });
     }
 }
-    
+
 export default DesafiosService;

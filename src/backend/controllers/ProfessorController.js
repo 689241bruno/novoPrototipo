@@ -66,3 +66,29 @@ exports.deletarProfessor = async (req, res) => {
         res.status(500).json({ erro: "Erro ao deletar professor." });
     }
 };
+
+exports.editarMaterial = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { titulo, materia, tema, subtema } = req.body;
+        const arquivo = req.file ? req.file.filename : null;
+
+        await Professor.editarMaterial(id, { titulo, materia, tema, subtema, arquivo });
+
+        res.json({ mensagem: "Material atualizado com sucesso!" });
+    } catch (err) {
+        console.error("Erro ao editar material:", err);
+        res.status(500).json({ erro: "Erro ao editar material!" });
+    }
+};
+
+exports.deletarMaterial = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Professor.deletarMaterial(id);
+        res.json({ mensagem: "Material excluído com sucesso!" });
+    } catch (err) {
+        console.error("Erro ao deletar material:", err);
+        res.status(500).json({ erro: "Erro ao deletar material!" });
+    }
+};

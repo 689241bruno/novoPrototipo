@@ -15,6 +15,15 @@ class ProfessorService {
     static async editarProfessor(usuario_id, dados) {
         return axios.put(`${API_URL}/editprofessor/${usuario_id}`, dados);
     }
+
+    static async editarMaterial(id, dados) {
+        return axios.put(`${API_URL}/materiais/${id}`, dados);
+    }
+    
+    static async deletarMaterial(id) {
+        return axios.delete(`${API_URL}/materiais/${id}`);
+    }
+
 };
 
 export default ProfessorService;

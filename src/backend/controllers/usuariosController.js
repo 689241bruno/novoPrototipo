@@ -84,7 +84,7 @@ exports.login = async (req, res) => {
 
 // Editar 
 exports.editarUsuario = async (req, res) => {
-    const { id, nome, cor, foto } = req.body; // <-- inclui foto direto do JSON
+    const { id, nome, email, cor, foto } = req.body; // <-- inclui foto direto do JSON
 
     try {
         console.log("📦 Dados recebidos para edição:", { id, nome, cor, temFoto: !!foto });
@@ -96,7 +96,7 @@ exports.editarUsuario = async (req, res) => {
         fotoBuffer = Buffer.from(base64Data, "base64");
         }
 
-        const usuarioAtualizado = await Usuario.editar(id, { nome, cor, foto: fotoBuffer });
+        const usuarioAtualizado = await Usuario.editar(id, { nome, email, cor, foto: fotoBuffer });
         res.json({
         mensagem: "Usuário atualizado com sucesso!",
         usuario: usuarioAtualizado

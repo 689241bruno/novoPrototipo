@@ -52,6 +52,32 @@ class Professor extends Usuario {
         );
         return result;
     }
+
+    static async editarMaterial(idMaterial, dados) {
+        const { titulo, materia, tema, subtema, arquivo } = dados;
+
+        let query = "UPDATE material SET titulo = ?, materia = ?, tema = ?, subtema = ?";
+        const values = [titulo, materia, tema, subtema];
+
+        if (arquivo) {
+            query += ", arquivo = ?";
+            values.push(arquivo);
+        }
+
+        query += " WHERE id = ?";
+        values.push(idMaterial);
+
+        await connection.query(query, values);
+        console.log("EDITANDO MATERIAL:", idMaterial, dados);
+        return true;
+    }
+
+    // Deleta um material pelo ID
+    static async deletarMaterial(idMaterial) {
+        const query = "DELETE FROM material WHERE id = ?";
+        await connection.query(query, [idMaterial]);
+        return true;
+    }
 }
 
 module.exports = Professor;

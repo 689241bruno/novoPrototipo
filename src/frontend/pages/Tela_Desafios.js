@@ -73,13 +73,6 @@ export default function Tela_Desafios() {
                                         <ProgressBar progress={item.progresso || 0} height={12} />
                                         <Text style={styles.progressText}>{Math.round((item.progresso || 0) * 100)}%</Text>
                                     </View>
-                                    {!item.concluida ? (
-                                        <TouchableOpacity onPress={() => concluirDesafio(item)} style={{ marginTop: 6 }}>
-                                            <Text style={{ color: '#0b4e91', fontWeight: '700' }}>Marcar como concluído ✅</Text>
-                                        </TouchableOpacity>
-                                    ) : (
-                                        <Text style={{ marginTop: 6, color: 'green', fontWeight: '700' }}>Concluído ✔️</Text>
-                                    )}
                                 </View>
                             </View>
                         </View>

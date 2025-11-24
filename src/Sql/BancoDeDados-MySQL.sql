@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     is_professor TINYINT(1) NOT NULL DEFAULT 0, 
     is_admin TINYINT(1) NOT NULL DEFAULT 0, 
     foto LONGBLOB, 
-    cor VARCHAR(7) DEFAULT '#FFFFFF',
+    cor VARCHAR(7),
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP  
 ) ENGINE=InnoDB;
 
@@ -30,13 +30,21 @@ CREATE TABLE IF NOT EXISTS admin(
 CREATE TABLE IF NOT EXISTS alunos(
     usuario_id INT PRIMARY KEY,
     modoIntensivo TINYINT(1) NOT NULL DEFAULT 0,
-    diagnostico TEXT,
-    plano_estudo_id INT DEFAULT NULL,
     ranking INT DEFAULT 0, 
     xp BIGINT DEFAULT 0,
     progresso_percent TINYINT DEFAULT 0 CHECK (progresso_percent BETWEEN 0 AND 100),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (plano_estudo_id) REFERENCES plano_estudos(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS faq(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT,
+    pergunta VARCHAR(2000),
+    resposta VARCHAR(1000),
+    respondida TINYINT(1) NOT NULL DEFAULT 0,
+    pergunta_freq TINYINT(1) NOT NULL DEFAULT 0
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS material(
@@ -62,16 +70,17 @@ CREATE TABLE IF NOT EXISTS progresso_atividades (
 
 CREATE TABLE IF NOT EXISTS notificacoes(
     id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
     mensagem TEXT NOT NULL,
-    destinatario_id INT NOT NULL, 
-    lida TINYINT DEFAULT 0,
-    FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+    tipo VARCHAR(100)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS desafios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     descricao VARCHAR(255),
+    materia VARCHAR(255),
+    quantidade INT,
     xp INT DEFAULT 0,
     img LONGBLOB
 );
@@ -96,7 +105,6 @@ CREATE TABLE IF NOT EXISTS flashcards(
     ultima_revisao DATETIME,
     proxima_revisao DATETIME,
     repeticoes INT DEFAULT 0,
-    dificuldade FLOAT DEFAULT 2.5, 
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
@@ -107,6 +115,7 @@ CREATE TABLE IF NOT EXISTS redacoes(
     titulo VARCHAR(255) NOT NULL,
     texto LONGTEXT NOT NULL,
     tempo TIME, 
+    data DATE,
     comp1 INT,
     comp2 INT,
     comp3 INT,
@@ -114,11 +123,30 @@ CREATE TABLE IF NOT EXISTS redacoes(
     comp5 INT,
     nota_ia INT, 
     nota_professor INT,
+    feedback TEXT,
     corrigida_por_professor INT, 
-    corrigida  TINYINT(1) DEFAULT 0 NOT NULL,
+    corrigida  TINYINT(1) DEFAULT 0,
     FOREIGN KEY (aluno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (corrigida_por_professor) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS tema_redacao(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tema VARCHAR(255) UNIQUE,
+    ano INT,
+    titulo_texto1 VARCHAR(255),
+    titulo_texto2 VARCHAR(255),
+    titulo_texto3 VARCHAR(255),
+    titulo_texto4 VARCHAR(255),
+    texto1 LONGTEXT,
+    texto2 LONGTEXT,
+    texto3 LONGTEXT,
+    texto4 LONGTEXT,
+    img1 LONGBLOB,
+    img2 LONGBLOB,
+    img3 LONGBLOB,
+    img4 LONGBLOB
+) ENGINE=InnoDB; 
 
 CREATE TABLE IF NOT EXISTS plano_estudos(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -135,39 +163,39 @@ CREATE TABLE IF NOT EXISTS simulados(
     id INT AUTO_INCREMENT PRIMARY KEY,
     feito_por INT,
     data DATE,
+    tempo INT,
     pontuacao INT,
+    linguagens INT,
+    exatas INT,
+    ciencias_hum INT,
+    ciencias_nat INT, 
     FOREIGN KEY (feito_por) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS categories(
-    category_id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    category_name TEXT NOT NULL UNIQUE
-);
+CREATE TABLE IF NOT EXISTS questoes (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    enunciado TEXT NOT NULL,
+    ano INTEGER NOT NULL,
+    prova VARCHAR(100),
+    materia VARCHAR(100),
+    dificuldade INT,
+    tema VARCHAR(100)
+) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS subcategories(
-    subcategory_id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    category_name TEXT NOT NULL UNIQUE,
-    category_id INTEGER NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id)
-);
-
-CREATE TABLE IF NOT EXISTS questions(
-    q_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    q_title TEXT NOT NULL,
-    q_text TEXT NOT NULL,
-    q_year INTEGER NOT NULL,
-    q_category_id INTEGER NOT NULL, 
-    q_subcategory_id INTEGER NOT NULL,
-    FOREIGN KEY (q_category_id) REFERENCES categories(category_id),
-    FOREIGN KEY (q_subcategory_id) REFERENCES subcategories(subcategory_id)
-);
-
-CREATE TABLE IF NOT EXISTS alternatives(
-    alternative_id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    alternative_letter CHAR(1) NOT NULL,
-    alternative_text TEXT NOT NULL,
-    is_correct BOOLEAN NOT NULL,
-    question_id INTEGER NOT NULL,
-    UNIQUE(question_id),
-    FOREIGN KEY (question_id) REFERENCES questions(q_id)
-);
+CREATE TABLE IF NOT EXISTS alternativas (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    letra1 CHAR(1) NOT NULL,
+    texto1 TEXT NOT NULL,
+    letra2 CHAR(1) NOT NULL,
+    texto2 TEXT NOT NULL,
+    letra3 CHAR(1) NOT NULL,
+    texto3 TEXT NOT NULL,
+    letra4 CHAR(1) NOT NULL,
+    texto4 TEXT NOT NULL,
+    letra5 CHAR(1) NOT NULL,
+    texto5 TEXT NOT NULL,
+    correta TINYINT(1) DEFAULT 0,
+    questao_id INTEGER NOT NULL,
+    FOREIGN KEY (questao_id) REFERENCES questoes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;

@@ -21,6 +21,7 @@ import { useState, useMemo, useEffect } from 'react';
 import PlanoService from '../services/PlanoService';
 
 const { width: SCREEN_W } = Dimensions.get('window');
+const CELL_WIDTH = Math.floor(SCREEN_W / 7);
 
 const weekNames = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 
@@ -113,12 +114,16 @@ function CalendarGrid({ selectedDate, onSelect }) {
     const year = baseDate.getFullYear();
     const month = baseDate.getMonth() + monthOffset;
 
-    const firstDay = new Date(year, month, 1).getDay();
+    // Semana começa na segunda -> ajustar firstDay
+    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // 0 = Mon, 6 = Sun
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const cells = [];
     for (let i = 0; i < firstDay; i++) cells.push(null);
     for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+
+    // Cabeçalho compatível com week starting on Monday
+    const weekHeaderLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
     return (
         <View style={styles.calendarContainer}>
@@ -135,10 +140,12 @@ function CalendarGrid({ selectedDate, onSelect }) {
                 </TouchableOpacity>
             </View>
 
-            {/* Cabeçalho dos dias da semana */}
+            {/* Cabeçalho dos dias da semana (segunda -> domingo) */}
             <View style={styles.weekHeaderRow}>
-                {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((w) => (
-                    <Text key={w} style={styles.weekHeader}>{w}</Text>
+                {weekHeaderLabels.map((w, i) => (
+                    <View key={i} style={[styles.weekHeaderCell, { width: CELL_WIDTH }]}>
+                        <Text style={styles.weekHeader}>{w}</Text>
+                    </View>
                 ))}
             </View>
 
@@ -153,6 +160,7 @@ function CalendarGrid({ selectedDate, onSelect }) {
                             key={String(i)}
                             style={[
                                 styles.calendarCell,
+                                { flexBasis: `${100 / 7}%` },
                                 isToday && styles.calendarCellToday,
                                 isSelected && styles.calendarCellSelected
                             ]}
@@ -169,6 +177,7 @@ function CalendarGrid({ selectedDate, onSelect }) {
         </View>
     );
 }
+
 
 export default function Tela_PlanoDeEstudos() {
     const [mode, setMode] = useState('dias'); // 'dias' | 'cal'
@@ -391,13 +400,30 @@ export default function Tela_PlanoDeEstudos() {
 
             const hoje = new Date();
             const diaSelecionado = new Date(hoje);
-            diaSelecionado.setDate(hoje.getDate() - hoje.getDay() + uiDayToJsDay(newDayIndex));;
+            const targetJsDay = newDayIndex - 1;
+            diaSelecionado.setDate(
+                hoje.getDate() - hoje.getDay() + targetJsDay
+            );
             const dia = diaSelecionado.toISOString().split('T')[0]; 
             await PlanoService.criarTarefa({ usuario_id, dia, materia: newMateria, tema: newTema, inicio: newStart, termino: newEnd });
 
-            // Atualiza a lista local
             const updated = [...weekData];
-            updated[newDayIndex - 1].tasks.push({ materia: newMateria, tema: newTema, start: newStart, end: newEnd });
+            const nova = await PlanoService.criarTarefa({
+                usuario_id,
+                dia,
+                materia: newMateria,
+                tema: newTema,
+                inicio: newStart,
+                termino: newEnd
+            });
+
+            updated[newDayIndex - 1].tasks.push({
+                id: nova.id,
+                materia: newMateria,
+                tema: newTema,
+                start: newStart,
+                end: newEnd
+            });
             setWeekData(updated);
 
             setModalVisible(false);
@@ -447,7 +473,7 @@ export default function Tela_PlanoDeEstudos() {
                             item={d}
                             expanded={expandedIndex === idx}
                             onToggle={() => toggleExpand(idx)}
-                            onEdit={(day, task) => openEditModal(task)}
+                            onEdit={(day, task) => openEditModal({ ...task, dayIndex: day.dayIndex })}
                             onDelete={(tarefa) => {
                                 setTaskToDelete(tarefa);
                                 setDeleteModalVisible(true);
@@ -499,7 +525,10 @@ export default function Tela_PlanoDeEstudos() {
                                     weekData[selectedDate.getDay()].tasks.map((tarefa, index) => (
                                         <TouchableOpacity
                                             key={tarefa.id || index}
-                                            onPress={() => handleTaskClickForEdit(tarefa)}
+                                            onPress={() => handleTaskClickForEdit({ 
+                                                ...tarefa, 
+                                                dayIndex: jsDayToUiDay(selectedDate.getDay()) 
+                                            })}
                                             style={[
                                                 styles.smallTaskCard,
                                                 multiDeleteMode && selectedTasks.includes(tarefa.id) && { backgroundColor: '#f8d7da' }
@@ -714,6 +743,8 @@ export default function Tela_PlanoDeEstudos() {
         </SafeAreaView>
     );
 }
+    // largura de cada célula (com pequena margem)
+const CELL_HEIGHT = CELL_WIDTH * 1.1;   // altura proporcional para manter aspecto bonito
 
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#0b4e91' },
@@ -778,27 +809,43 @@ const styles = StyleSheet.create({
     sendButton: { marginTop: 12, backgroundColor: '#0b4e91', padding: 12, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
 
     calendarContainer: { padding: 6, backgroundColor: '#fff', borderRadius: 10, marginBottom: 12 },
-    weekHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 6 },
     weekHeader: { width: (SCREEN_W - 60) / 7, textAlign: 'center', fontWeight: '700', color: '#5b6b79' },
-    calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-    calendarCell: {
-        width: (SCREEN_W - 72) / 7,  // era 60
-        height: 44,
-        justifyContent: 'center',
+
+    weekHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    weekHeaderCell: {
         alignItems: 'center',
-        marginVertical: 2,           // dá um espaçamento suave
-        borderWidth: 1,
-        borderColor: 'transparent',
+        paddingVertical: 4,
     },
-    calendarCellText: { color: '#1f3f67' },
+    calendarGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between', // << AQUI
+    },
+    calendarCell: {
+        aspectRatio: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 8,
+        marginBottom: 10,
+    },
+
     calendarCellToday: {
-        borderColor: '#0b4e91',
-        borderRadius: 6,
+        backgroundColor: "#e3f2fd",
+        borderRadius: 10,
     },
+
     calendarCellSelected: {
-        backgroundColor: '#0b4e91',
-        borderColor: '#0b4e91',  
-        borderRadius: 6,
+        backgroundColor: "#0b4e91",
+        borderRadius: 10,
+    },
+
+    calendarCellText: {
+        fontSize: 15,
+        fontWeight: "600",
+        color: "#1e293b",
     },
 
     selectedDayBox: { marginTop: 12, backgroundColor: '#fff', padding: 10, borderRadius: 10 },

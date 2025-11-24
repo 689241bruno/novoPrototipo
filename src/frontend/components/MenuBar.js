@@ -6,7 +6,7 @@ const imagens = {
   PlanoEstudos: require("../assets/PlanoEstudos_Icon.png"),
   Flashcards: require("../assets/Flashcards_Icon.png"),
   Home: require("../assets/Home_Icon.png"),
-  Desafios: require("../assets/Conquests_Icon.png"),
+  Desafios: require("../assets/Desafios_Icon.png"),
   Ranking: require("../assets/Ranking_Icon.png"),
 };
 
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   container: {
     height: 90,
     width: "100%",
-    backgroundColor: "#FFF",
+    backgroundColor: "#eef9ffff",
     position: "absolute",
     bottom: 0,
     elevation: 5,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    backgroundColor: "#FFF",
+    backgroundColor: "#eef9ffff",
     elevation: 5,
   },
   botao: {
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   botaoMeio: {
     height: 70,
     width: 70,
-    backgroundColor: "#f1f1f1ff",
+    backgroundColor: "#eef9ffff",
     borderRadius: 35,
     elevation: 5,
     alignItems: "center",

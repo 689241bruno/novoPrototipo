@@ -279,8 +279,6 @@ export default function PerfilScreen({ navigation }) {
         barPercentage: 0.6,
     };
 
-    
-
     const SessionButton = ({ sessionKey, label }) => (
         <TouchableOpacity
             style={{
@@ -310,7 +308,7 @@ export default function PerfilScreen({ navigation }) {
             <Animatable.View delay={300} animation="fadeInUp" style={styles.whiteContainer}>
                 <ScrollView contentContainerStyle={styles.scrollContainer}>
                     {/* Avatar, Nome e Edição */}
-                    <View style={[styles.profileHeader, { backgroundColor: usuario.cor || "#0b4e91" }]}>
+                    <View style={[styles.profileHeader, { backgroundColor: usuario.cor || "#9ac7ecff" }]}>
                         <TouchableOpacity onPress={() => setEditando(true)} style={styles.avatarContainerWrapper}>
                             <View style={styles.avatarOuterCircle}>
                                 {console.log("🧠 URI da foto:", usuario.foto)}
@@ -439,7 +437,7 @@ export default function PerfilScreen({ navigation }) {
                                 style={styles.colorIcon}
                                 onPress={() => setShowColorPicker(true)}
                             >
-                            <Icon name="color-palette" size={26} color="#fff" />
+                            <Icon name="color-palette" size={26} color="#ffffffff" />
                             </TouchableOpacity>
 
                             {/* Avatar clicável para selecionar imagem */}
@@ -615,7 +613,7 @@ const styles = StyleSheet.create({
     colorPickerContainer: { width: "85%", height: 350, backgroundColor: "#fff", borderRadius: 15, padding: 15, },
     profileHeader: { width: "100%", height: 150, justifyContent: "flex-end", alignItems: "center", position: "relative", borderTopLeftRadius: 15, borderTopRightRadius: 15, overflow: "visible", paddingBottom: 55, },
     avatarContainerWrapper: { position: "absolute", bottom: -55, zIndex: 5, },
-    avatarOuterCircle: { width: 110, height: 110, borderRadius: 55, backgroundColor: "#fff", justifyContent: "center", alignItems: "center", elevation: 5, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 3 }, },
+    avatarOuterCircle: { width: 110, height: 110, borderRadius: 55, backgroundColor: "#9ac7ecff", justifyContent: "center", alignItems: "center", elevation: 5, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 3 }, },
     avatarNoPhotoBackground: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 55, },
     avatarIconOverlay: { position: "absolute", alignSelf: "center", },
     editIconTop: { position: "absolute", top: 10, right: 10, backgroundColor: "rgba(0,0,0,0.3)", padding: 6, borderRadius: 20, },
