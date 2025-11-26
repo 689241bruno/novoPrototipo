@@ -101,7 +101,6 @@ export default function RankingScreen() {
       }
       const data = await response.json();
 
-      // LÓGICA DE RANKING NO FRONTEND (DENSE_RANK)
       let currentRank = 1;
       let previousXp = -1;
       let tiedUsersCount = 0;
@@ -109,21 +108,18 @@ export default function RankingScreen() {
       const formattedData = data.map((item, index) => {
         const currentXp = parseInt(item.xp, 10);
 
-        // Se o XP é diferente do anterior, avança o rank para a posição atual (index + 1)
         if (currentXp !== previousXp) {
           currentRank = index + 1;
           tiedUsersCount = 0;
         } else {
-          // Se o XP é igual, conta como empate
           tiedUsersCount++;
         }
 
         previousXp = currentXp;
 
-        // Retorna o objeto formatado com o rank calculado
         return {
           id: item.id,
-          // rank: Rank (correto para DENSE_RANK), o rank é sempre o (index + 1) - tiedUsersCount se o xp for igual
+
           rank: currentRank - tiedUsersCount,
           name: item.nome,
           xp: currentXp,
