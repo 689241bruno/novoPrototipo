@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   View,
@@ -13,26 +13,12 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as Animatable from "react-native-animatable";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5"; // Para a coroa
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import MenuBar from "../components/MenuBar";
 import TopNavbar from "../components/TopNavbar";
-// --- 1. Dados de Exemplo ---
-const rankingData = [
-  { id: 1, rank: 1, name: "Usuário TOP 1", xp: 950000, studyTime: "15:30" },
-  { id: 2, rank: 2, name: "Usuário TOP 2", xp: 820000, studyTime: "14:15" },
-  { id: 3, rank: 3, name: "Usuário TOP 3", xp: 750000, studyTime: "13:00" },
-  { id: 4, rank: 4, name: "<Usuário>", xp: 600000, studyTime: "10:00" },
-  { id: 5, rank: 5, name: "<Usuário>", xp: 550000, studyTime: "10:00" },
-  { id: 6, rank: 6, name: "<Usuário>", xp: 500000, studyTime: "10:00" },
-  { id: 7, rank: 7, name: "<Usuário>", xp: 450000, studyTime: "10:00" },
-  { id: 8, rank: 8, name: "<Usuário>", xp: 400000, studyTime: "10:00" },
-  { id: 9, rank: 9, name: "<Usuário>", xp: 350000, studyTime: "10:00" },
-];
 
-const topThree = rankingData.slice(0, 3);
-const lowerRanking = rankingData.slice(3);
+const API_URL = "http://localhost:3000/alunos/ranking-geral";
 
-// --- 2. Componente de Item da Lista (4º em diante) ---
 const RankingItem = ({ rank, name, xp, studyTime }) => (
   <View style={styles.itemContainer}>
     <Text style={styles.rankText}>{rank}</Text>
@@ -41,20 +27,27 @@ const RankingItem = ({ rank, name, xp, studyTime }) => (
     </View>
     <View style={styles.infoBlock}>
       <Text style={styles.nameText}>{name}</Text>
-      <Text style={styles.detailText}>Xp: {xp.toLocaleString("pt-BR")}</Text>
+
+      <Text style={styles.detailText}>
+        Xp: {xp ? xp.toLocaleString("pt-BR") : "0"}
+      </Text>
     </View>
-    <Text style={styles.studyTimeText}>Tempo de Estudo: {studyTime}</Text>
+    <Text style={styles.studyTimeText}>
+      Tempo de Estudo: {studyTime || "00:00"}
+    </Text>
   </View>
 );
 
-// --- 3. Componente Top 3 em Destaque ---
-const TopThreeDisplay = () => {
-  // Organiza para a ordem da tela: 3º, 1º, 2º
-  const third = topThree.find((u) => u.rank === 3);
-  const first = topThree.find((u) => u.rank === 1);
-  const second = topThree.find((u) => u.rank === 2);
+const TopThreeDisplay = ({ topThreeData }) => {
+  const first = topThreeData.find((u) => u.rank === 1);
+  const second = topThreeData.find((u) => u.rank === 2);
+  const third = topThreeData.find((u) => u.rank === 3);
 
-  const TopThreeItem = ({ rank, isMain }) => {
+  const displayOrder = [third, first, second];
+
+  const TopThreeItem = ({ rank, name, xp, studyTime }) => {
+    const isMain = rank === 1;
+
     return (
       <View style={[styles.topThreeItem, isMain && styles.mainRankContainer]}>
         <View
@@ -74,71 +67,130 @@ const TopThreeDisplay = () => {
           <Icon name="person" size={isMain ? 40 : 30} color="#fff" />
         </View>
         <Text style={styles.topThreeRank}>{rank}</Text>
+        <Text style={styles.topThreeName}>{name}</Text>
+        <Text style={styles.topThreeDetail}>
+          XP: {xp ? xp.toLocaleString("pt-BR") : 0}
+        </Text>
       </View>
     );
   };
 
   return (
     <View style={styles.topThreeContainer}>
-      {/* 3º Lugar */}
-      {third && <TopThreeItem {...third} />}
-
-      {/* 1º Lugar */}
-      {first && <TopThreeItem {...first} isMain={true} />}
-
-      {/* 2º Lugar */}
-      {second && <TopThreeItem {...second} />}
+      {displayOrder.map((user, index) =>
+        user ? (
+          <TopThreeItem key={user.rank} {...user} />
+        ) : (
+          <View key={index} style={styles.topThreeItemPlaceholder} />
+        )
+      )}
     </View>
   );
 };
 
-// --- 4. Componente Principal da Tela ---
 export default function RankingScreen() {
+  const [rankingData, setRankingData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRanking = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(API_URL);
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+      const data = await response.json();
+
+      // LÓGICA DE RANKING NO FRONTEND (DENSE_RANK)
+      let currentRank = 1;
+      let previousXp = -1;
+      let tiedUsersCount = 0;
+
+      const formattedData = data.map((item, index) => {
+        const currentXp = parseInt(item.xp, 10);
+
+        // Se o XP é diferente do anterior, avança o rank para a posição atual (index + 1)
+        if (currentXp !== previousXp) {
+          currentRank = index + 1;
+          tiedUsersCount = 0;
+        } else {
+          // Se o XP é igual, conta como empate
+          tiedUsersCount++;
+        }
+
+        previousXp = currentXp;
+
+        // Retorna o objeto formatado com o rank calculado
+        return {
+          id: item.id,
+          // rank: Rank (correto para DENSE_RANK), o rank é sempre o (index + 1) - tiedUsersCount se o xp for igual
+          rank: currentRank - tiedUsersCount,
+          name: item.nome,
+          xp: currentXp,
+          studyTime: item.studyTime || "00:00",
+        };
+      });
+
+      setRankingData(formattedData);
+    } catch (error) {
+      console.error("Falha ao buscar o ranking:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRanking();
+  }, []);
+
+  const topThree = rankingData.slice(0, 3);
+  const lowerRanking = rankingData.slice(3);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0a1930" />
 
-      {/* Cabeçalho Fixo */}
       <View delay={300} animation={"fadeInDown"} style={styles.header}>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
           <TopNavbar />
-        </SafeAreaView>              
+        </SafeAreaView>
       </View>
 
-      {/* Conteúdo Principal (Scrollable) */}
       <View style={styles.mainContent}>
-        <Text style={styles.rankingTitle}></Text>
+        <Text style={styles.rankingTitle}>Ranking</Text>
 
-        {/* Top 3 */}
-        <TopThreeDisplay />
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Carregando Ranking...</Text>
+          </View>
+        ) : (
+          <>
+            <TopThreeDisplay topThreeData={topThree} />
 
-        {/* Separador da lista */}
-        <View style={styles.separator}>
-          <Icon name="reorder-three-outline" size={30} color="#0a1930" />
-        </View>
+            <View style={styles.separator}>
+              <Icon name="reorder-three-outline" size={30} color="#0a1930" />
+            </View>
 
-        {/* Lista do 4º em diante */}
-        <ScrollView style={styles.listContainer}>
-          {lowerRanking.map((item) => (
-            <RankingItem key={item.id} {...item} />
-          ))}
-          {/* Linha adicional para o 10º */}
-          <RankingItem
-            rank={10}
-            name={"<Usuário>"}
-            xp={250000}
-            studyTime={"10:00"}
-          />
-        </ScrollView>
+            <ScrollView style={styles.listContainer}>
+              {lowerRanking.length > 0 ? (
+                lowerRanking.map((item) => (
+                  <RankingItem key={item.id} {...item} />
+                ))
+              ) : (
+                <Text style={styles.emptyListText}>
+                  Nenhum outro aluno encontrado no ranking.
+                </Text>
+              )}
+            </ScrollView>
+          </>
+        )}
       </View>
 
-      {/* Menu Inferior Fixo */}
       <MenuBar />
     </SafeAreaView>
   );
 }
 
-// --- 5. Estilos ---
 const BLUE_BG = "#0a1930";
 const LIGHT_BLUE = "#3b82f6";
 const WHITE = "#ffffff";
@@ -150,41 +202,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#338BE5",
   },
 
-  // --- Header ---
-  header: {
-    width: "100%",
-    marginTop: 20,
-    marginBottom: 10,
-    height: 60,
-    backgroundColor: "#FFF",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    elevation: 5,
-  },
-  botao: {
-    width: 40,
-    height: 40,
-    borderRadius: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logoText: {
-    color: WHITE,
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-
-  // --- Main Content ---
   mainContent: {
     flex: 1,
-    backgroundColor: "white", // Fundo branco do card principal
+    backgroundColor: "white",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 15,
-    marginHorizontal: 10, // Simula a margem do iPhone
+    marginHorizontal: 10,
     borderRadius: 15,
     marginBottom: 10,
   },
@@ -192,11 +216,26 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 30,
     color: BLUE_BG,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 200,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: BLUE_BG,
+  },
+  emptyListText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 14,
+    color: "#6b7280",
+  },
 
-  // --- Top 3 Styles ---
   topThreeContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -208,8 +247,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "30%",
   },
+  topThreeItemPlaceholder: {
+    width: "30%",
+  },
   mainRankContainer: {
-    marginTop: -20, // Move o primeiro lugar para cima
+    marginTop: -20,
   },
   topThreeIconBackground: {
     borderRadius: 50,
@@ -224,7 +266,8 @@ const styles = StyleSheet.create({
     backgroundColor: BLUE_BG,
     padding: 15,
     borderWidth: 4,
-    borderColor: "#FFD700", // Dourado
+    borderColor: "#FFD700",
+    margin: 15,
   },
   otherPlaceBg: {
     backgroundColor: LIGHT_BLUE,
@@ -241,8 +284,18 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: BLUE_BG,
   },
+  topThreeName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: BLUE_BG,
+    textAlign: "center",
+    marginTop: 2,
+  },
+  topThreeDetail: {
+    fontSize: 10,
+    color: "#6b7280",
+  },
 
-  // --- Separator ---
   separator: {
     alignItems: "center",
     paddingVertical: 10,
@@ -252,7 +305,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 
-  // --- List Styles (4º em diante) ---
   listContainer: {
     flex: 1,
     paddingHorizontal: 10,
@@ -271,7 +323,7 @@ const styles = StyleSheet.create({
   rankText: {
     fontSize: 16,
     fontWeight: "bold",
-    width: 25, // Largura fixa para alinhamento
+    width: 25,
     textAlign: "center",
     color: BLUE_BG,
   },
@@ -299,16 +351,5 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#6b7280",
     textAlign: "right",
-  },
-
-  // --- Navigation Bar ---
-  navBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 15,
-    backgroundColor: BLUE_BG,
-  },
-  navItem: {
-    padding: 5,
   },
 });
