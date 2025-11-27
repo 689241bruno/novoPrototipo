@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://localhost:3000"; // ajuste se necessário
+const API_URL = "https://api-tcc-9lha.onrender.com"; // ajuste se necessário
 
 class DesafiosService {
   static async listarDesafios() {

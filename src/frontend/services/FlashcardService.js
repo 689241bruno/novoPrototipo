@@ -1,13 +1,15 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_URL = "http://localhost:3000"; // se for rodar no navegador -> http://localhost:3000
+const API_URL = "https://api-tcc-9lha.onrender.com"; // se for rodar no navegador -> http://localhost:3000
 
 class FlashcardService {
   // Listar todos os flashcards de um usuário
   static async listarFlashcards(usuario_id) {
     try {
-      const response = await axios.get(`${API_URL}/flashcards/listar/${usuario_id}`);
+      const response = await axios.get(
+        `${API_URL}/flashcards/listar/${usuario_id}`
+      );
       return response.data;
     } catch (err) {
       console.error("Erro ao listar flashcards:", err);
@@ -16,7 +18,13 @@ class FlashcardService {
   }
 
   // Criar novo flashcard
-  static async criarFlashcard(usuario_id, pergunta, resposta, materia, repeticoes) {
+  static async criarFlashcard(
+    usuario_id,
+    pergunta,
+    resposta,
+    materia,
+    repeticoes
+  ) {
     try {
       const response = await axios.post(`${API_URL}/flashcards/criar`, {
         usuario_id,
@@ -35,7 +43,10 @@ class FlashcardService {
   // Editar flashcard existente
   static async editarFlashcard(id, dados) {
     try {
-      const response = await axios.put(`${API_URL}/flashcards/editar/${id}`, dados);
+      const response = await axios.put(
+        `${API_URL}/flashcards/editar/${id}`,
+        dados
+      );
       return response.data;
     } catch (err) {
       console.error("Erro ao editar flashcard:", err);
@@ -46,7 +57,9 @@ class FlashcardService {
   // Deletar flashcard
   static async deletarFlashcard(id) {
     try {
-      const response = await axios.delete(`${API_URL}/flashcards/deletar/${id}`);
+      const response = await axios.delete(
+        `${API_URL}/flashcards/deletar/${id}`
+      );
       return response.data;
     } catch (err) {
       console.error("Erro ao deletar flashcard:", err);
@@ -70,15 +83,15 @@ class FlashcardService {
     try {
       const usuario = await AsyncStorage.getItem("usuario");
       if (!usuario) {
-          console.warn("Nenhum usuário salvo no AsyncStorage");
-          return null;
+        console.warn("Nenhum usuário salvo no AsyncStorage");
+        return null;
       }
       const parsed = JSON.parse(usuario);
       console.log("ID do usuário no AsyncStorage:", parsed.id);
       return parsed.id || null;
     } catch (err) {
-        console.error("Erro ao obter ID do usuário logado:", err);
-        return null;
+      console.error("Erro ao obter ID do usuário logado:", err);
+      return null;
     }
   }
 }

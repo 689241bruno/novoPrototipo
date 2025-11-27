@@ -11,7 +11,6 @@ import {
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 
-
 import axios from "axios";
 
 export default function Usuarios() {
@@ -25,7 +24,7 @@ export default function Usuarios() {
   const buscarUsuarios = async () => {
     try {
       const resposta = await axios.get(
-        "https://localhost:3000/usuarios"
+        "https://api-tcc-9lha.onrender.com/usuarios"
       );
 
       setUsuarios(resposta.data);

@@ -17,7 +17,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import MenuBar from "../components/MenuBar";
 import TopNavbar from "../components/TopNavbar";
 
-const API_URL = "http://localhost:3000/alunos/ranking-geral";
+const API_URL = "https://api-tcc-9lha.onrender.com/alunos/ranking-geral";
 
 const RankingItem = ({ rank, name, xp, studyTime }) => (
   <View style={styles.itemContainer}>
