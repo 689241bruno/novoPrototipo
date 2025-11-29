@@ -12,13 +12,13 @@ const imagens = {
 
 export default function MenuBar() {
   const navigation = useNavigation();
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.nav}>
         {/* Lado esquerdo */}
         <View style={styles.section}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.botao}
             onPress={() => navigation.navigate("PlanoDeEstudos")}
           >
@@ -29,7 +29,7 @@ export default function MenuBar() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.botaoMaior}
             onPress={() => navigation.navigate("Flashcard")}
           >
@@ -43,7 +43,7 @@ export default function MenuBar() {
 
         {/* Botão central */}
         <View style={styles.sectionMeio}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.botaoMeio}
             onPress={() => navigation.navigate("Principal")}
           >
@@ -57,7 +57,7 @@ export default function MenuBar() {
 
         {/* Lado direito */}
         <View style={styles.section}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.botaoMaior}
             onPress={() => navigation.navigate("Desafios")}
           >
@@ -68,7 +68,7 @@ export default function MenuBar() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.botao}
             onPress={() => navigation.navigate("Ranking")}
           >
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "33%",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
     flexDirection: "row",
     gap: 20,
   },
@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     backgroundColor: "#eef9ffff",
-    elevation: 5,
   },
   botao: {
     height: 55,

@@ -40,8 +40,9 @@ class AlunoService {
     });
   }
 
-  static async checkRanking(usuario_id) {
-    return axios.get(`${API_URL}/alunos/ranking/${usuario_id}`);
+  static async buscarRankingGeral() {
+    const response = await axios.get(`${API_URL}/alunos/ranking-geral`);
+    return response.data;
   }
 
   static async addXp(usuario_id, xp) {

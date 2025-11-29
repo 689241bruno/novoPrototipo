@@ -1,28 +1,51 @@
 import React, { useEffect, useState, useRef } from "react";
-import { 
-  SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Pressable, Image, 
-  LayoutAnimation, UIManager, Platform, ScrollView, Modal, TextInput, Animated, Easing,  ActivityIndicator,
+import {
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable,
+  Image,
+  LayoutAnimation,
+  UIManager,
+  Platform,
+  ScrollView,
+  Modal,
+  TextInput,
+  Animated,
+  Easing,
+  ActivityIndicator,
 } from "react-native";
-import { useRoute, useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  useRoute,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Dimensions } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { MaterialIcons } from "@expo/vector-icons";
-import * as DocumentPicker from 'expo-document-picker';
-import DropDownPicker from 'react-native-dropdown-picker';
+import * as DocumentPicker from "expo-document-picker";
+import DropDownPicker from "react-native-dropdown-picker";
 import UsuarioService from "../services/UsuarioService";
 import AlunoService from "../services/AlunoService";
 import ProfessorService from "../services/ProfessorService";
-import MaterialService from '../services/MaterialService';
+import MaterialService from "../services/MaterialService";
 import MenuBar from "../components/MenuBar";
 import TopNavbar from "../components/TopNavbar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Habilita animação de layout no Android
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
 export default function TelaMateria() {
+  const insets = useSafeAreaInsets();
   const route = useRoute();
   const navigation = useNavigation();
   const { materia } = route.params || { materia: "Linguagens" };
@@ -85,10 +108,15 @@ export default function TelaMateria() {
         const usuarioId = tipoUsuario?.id;
         setUsuarioId(usuarioId);
 
-        const response = await MaterialService.listarMaterias(materiaSelecionada, usuarioId);
+        const response = await MaterialService.listarMaterias(
+          materiaSelecionada,
+          usuarioId
+        );
         setMateriais(response?.data || []);
 
-        const responseProgresso = await MaterialService.listarProgressoUsuario(usuarioId);
+        const responseProgresso = await MaterialService.listarProgressoUsuario(
+          usuarioId
+        );
         const progressoData = normalizarProgresso(responseProgresso.data);
         setProgressoUsuario(progressoData);
       } catch (err) {
@@ -108,7 +136,11 @@ export default function TelaMateria() {
         if (xpData) {
           const { atividadeId, xp } = JSON.parse(xpData);
 
-          if (progressoAtualizado.some(p => p.atividade_id === atividadeId && p.concluida === 1)) {
+          if (
+            progressoAtualizado.some(
+              (p) => p.atividade_id === atividadeId && p.concluida === 1
+            )
+          ) {
             animScale.setValue(0);
             animOpacity.setValue(0);
 
@@ -125,7 +157,8 @@ export default function TelaMateria() {
         if (!usuarioId) return;
 
         try {
-          const responseProgresso = await MaterialService.listarProgressoUsuario(usuarioId);
+          const responseProgresso =
+            await MaterialService.listarProgressoUsuario(usuarioId);
           const progressoData = normalizarProgresso(responseProgresso.data);
           setProgressoUsuario(progressoData);
           console.log("Progresso atualizado ao focar na tela:", progressoData);
@@ -142,7 +175,10 @@ export default function TelaMateria() {
 
   const fetchMateriais = async () => {
     try {
-      const response = await MaterialService.listarMaterias(materiaSelecionada, usuarioId);
+      const response = await MaterialService.listarMaterias(
+        materiaSelecionada,
+        usuarioId
+      );
       setMateriais(response?.data || []);
     } catch (err) {
       console.error("Erro ao buscar materiais:", err);
@@ -151,14 +187,14 @@ export default function TelaMateria() {
 
   const toggleTheme = (temaKey) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpandedThemes(prev => ({
+    setExpandedThemes((prev) => ({
       ...prev,
-      [temaKey]: !prev[temaKey]
+      [temaKey]: !prev[temaKey],
     }));
   };
   const toggleMateria = (titulo) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpandedMaterias(prev => ({ ...prev, [titulo]: !prev[titulo] }));
+    setExpandedMaterias((prev) => ({ ...prev, [titulo]: !prev[titulo] }));
   };
 
   const materiasAgrupadas = materiais.reduce((acc, item) => {
@@ -173,8 +209,8 @@ export default function TelaMateria() {
     if (!progressoUsuario || progressoUsuario.length === 0) return 0;
 
     const total = atividades.length;
-    const concluidas = atividades.filter(a =>
-      progressoUsuario.some(p => p.atividade_id === a.id && p.concluida === 1)
+    const concluidas = atividades.filter((a) =>
+      progressoUsuario.some((p) => p.atividade_id === a.id && p.concluida === 1)
     ).length;
 
     return Math.round((concluidas / total) * 100);
@@ -186,20 +222,24 @@ export default function TelaMateria() {
     if (Array.isArray(data)) return data;
 
     if (typeof data === "object") {
-      return Object.values(data).flatMap(v => Array.isArray(v) ? v : [v]);
+      return Object.values(data).flatMap((v) => (Array.isArray(v) ? v : [v]));
     }
 
     return [];
   };
 
   const atividadeConcluida = (atividadeId) => {
-    return progressoUsuario.some(p => p.atividade_id === atividadeId && p.concluida === 1);
+    return progressoUsuario.some(
+      (p) => p.atividade_id === atividadeId && p.concluida === 1
+    );
   };
 
   const marcarAtividadeConcluida = async (item) => {
     if (!usuarioId) return;
 
-    if (progressoUsuario.some((p) => p.atividade_id === item.id && p.concluida)) {
+    if (
+      progressoUsuario.some((p) => p.atividade_id === item.id && p.concluida)
+    ) {
       console.log(`Atividade ${item.id} já concluída. Nada a fazer.`);
       return;
     }
@@ -209,7 +249,10 @@ export default function TelaMateria() {
       await MaterialService.atualizarProgresso(usuarioId, item.id);
 
       // Atualiza progresso localmente
-      setProgressoUsuario((prev) => [...prev, { atividade_id: item.id, concluida: 1 }]);
+      setProgressoUsuario((prev) => [
+        ...prev,
+        { atividade_id: item.id, concluida: 1 },
+      ]);
       console.log(`Atividade ${item.id} marcada como concluída.`);
 
       // Adiciona XP
@@ -217,9 +260,15 @@ export default function TelaMateria() {
       const responseXp = await AlunoService.addXp(usuarioId, xp);
       console.log("XP adicionado com sucesso:", responseXp.data || responseXp);
 
-      await AsyncStorage.setItem("xpPendente", JSON.stringify({ atividadeId: item.id, xp }));
+      await AsyncStorage.setItem(
+        "xpPendente",
+        JSON.stringify({ atividadeId: item.id, xp })
+      );
     } catch (err) {
-      console.error("Erro ao marcar atividade como concluída ou adicionar XP:", err);
+      console.error(
+        "Erro ao marcar atividade como concluída ou adicionar XP:",
+        err
+      );
     }
   };
 
@@ -230,13 +279,24 @@ export default function TelaMateria() {
       input.accept = "application/pdf";
       input.onchange = (e) => {
         const file = e.target.files[0];
-        if (file) setArquivoPdf({ uri: URL.createObjectURL(file), name: file.name, type: file.type });
+        if (file)
+          setArquivoPdf({
+            uri: URL.createObjectURL(file),
+            name: file.name,
+            type: file.type,
+          });
       };
       input.click();
     } else {
-      const result = await DocumentPicker.getDocumentAsync({ type: "application/pdf" });
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "application/pdf",
+      });
       if (result.type === "success") {
-        setArquivoPdf({ uri: result.uri, name: result.name, type: result.mimeType || "application/pdf" });
+        setArquivoPdf({
+          uri: result.uri,
+          name: result.name,
+          type: result.mimeType || "application/pdf",
+        });
       }
     }
   };
@@ -258,15 +318,25 @@ export default function TelaMateria() {
       if (Platform.OS === "web") {
         const response = await fetch(arquivoPdf.uri);
         const blob = await response.blob();
-        formData.append("arquivo", new File([blob], arquivoPdf.name, { type: arquivoPdf.type }));
+        formData.append(
+          "arquivo",
+          new File([blob], arquivoPdf.name, { type: arquivoPdf.type })
+        );
       } else {
-        formData.append("arquivo", { uri: arquivoPdf.uri, name: arquivoPdf.name, type: arquivoPdf.type });
+        formData.append("arquivo", {
+          uri: arquivoPdf.uri,
+          name: arquivoPdf.name,
+          type: arquivoPdf.type,
+        });
       }
 
       const response = await MaterialService.publicarMateria(formData);
       if (response.status === 201) {
         alert("Material enviado com sucesso!");
-        setTitulo(""); setTema(""); setArquivoPdf(null); setModalVisible(false);
+        setTitulo("");
+        setTema("");
+        setArquivoPdf(null);
+        setModalVisible(false);
         fetchMateriais();
       } else {
         alert(response.data.erro || "Erro ao enviar material.");
@@ -278,7 +348,9 @@ export default function TelaMateria() {
   };
 
   const abrirModalEdicao = () => {
-    const idsSelecionados = Object.keys(selecionadosEdicao).filter(id => selecionadosEdicao[id]);
+    const idsSelecionados = Object.keys(selecionadosEdicao).filter(
+      (id) => selecionadosEdicao[id]
+    );
 
     if (idsSelecionados.length === 0) {
       alert("Selecione ao menos uma atividade para editar.");
@@ -287,7 +359,7 @@ export default function TelaMateria() {
 
     const primeiroId = parseInt(idsSelecionados[0]);
 
-    const primeiro = materiais.find(m => m.id === primeiroId);
+    const primeiro = materiais.find((m) => m.id === primeiroId);
 
     if (primeiro) {
       setTitulo(primeiro.titulo || "");
@@ -344,9 +416,16 @@ export default function TelaMateria() {
         if (Platform.OS === "web") {
           const response = await fetch(arquivoPdf.uri);
           const blob = await response.blob();
-          formData.append("arquivo", new File([blob], arquivoPdf.name, { type: arquivoPdf.type }));
+          formData.append(
+            "arquivo",
+            new File([blob], arquivoPdf.name, { type: arquivoPdf.type })
+          );
         } else {
-          formData.append("arquivo", { uri: arquivoPdf.uri, name: arquivoPdf.name, type: arquivoPdf.type });
+          formData.append("arquivo", {
+            uri: arquivoPdf.uri,
+            name: arquivoPdf.name,
+            type: arquivoPdf.type,
+          });
         }
 
         await MaterialService.publicarMateria(formData);
@@ -354,7 +433,10 @@ export default function TelaMateria() {
       }
 
       // Limpa e fecha modal
-      setTitulo(""); setTema(""); setSubtema(""); setArquivoPdf(null);
+      setTitulo("");
+      setTema("");
+      setSubtema("");
+      setArquivoPdf(null);
       setModoEdicao(null);
       setModalEnvioVisible(false);
       fetchMateriais();
@@ -365,9 +447,9 @@ export default function TelaMateria() {
   };
 
   const toggleSelecionadoEdicao = (id) => {
-    setSelecionadosEdicao(prev => ({
+    setSelecionadosEdicao((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
@@ -389,7 +471,12 @@ export default function TelaMateria() {
     }
 
     try {
-      await ProfessorService.editarMaterial(modoEdicao, { titulo, tema, subtema, materia: materiaSelecionada });
+      await ProfessorService.editarMaterial(modoEdicao, {
+        titulo,
+        tema,
+        subtema,
+        materia: materiaSelecionada,
+      });
       alert("Material atualizado com sucesso!");
       setModalEnvioVisible(false); // fechamos o mesmo modal
       setModoEdicao(null);
@@ -401,30 +488,29 @@ export default function TelaMateria() {
   };
 
   const toggleSelecionado = (id) => {
-    setSelecionadosExcluir(prev => ({
+    setSelecionadosExcluir((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
   const toggleSelecionadoExclusao = (id, tipo, parentId) => {
     // Se for tema, seleciona todas atividades desse tema
-    if(tipo === "tema"){
-      const todasAtividades = materiais.filter(m => m.tema === id);
+    if (tipo === "tema") {
+      const todasAtividades = materiais.filter((m) => m.tema === id);
       const novasSelecoes = {};
-      todasAtividades.forEach(a => novasSelecoes[a.id] = true);
-      setSelecionadosExcluir(prev => ({ ...prev, ...novasSelecoes }));
-    }
-    else if(tipo === "subtema"){
-      const todasAtividades = materiais.filter(m => m.subtema === id);
+      todasAtividades.forEach((a) => (novasSelecoes[a.id] = true));
+      setSelecionadosExcluir((prev) => ({ ...prev, ...novasSelecoes }));
+    } else if (tipo === "subtema") {
+      const todasAtividades = materiais.filter((m) => m.subtema === id);
       const novasSelecoes = {};
-      todasAtividades.forEach(a => novasSelecoes[a.id] = true);
-      setSelecionadosExcluir(prev => ({ ...prev, ...novasSelecoes }));
+      todasAtividades.forEach((a) => (novasSelecoes[a.id] = true));
+      setSelecionadosExcluir((prev) => ({ ...prev, ...novasSelecoes }));
     } else {
       toggleSelecionado(id);
     }
   };
-  
+
   const ativarExclusao = () => {
     setModoExclusao(!modoExclusao);
     setSelecionadosExcluir({});
@@ -439,8 +525,9 @@ export default function TelaMateria() {
     }
 
     // 2º clique → tenta confirmar
-    const selecionados = Object.keys(selecionadosExcluir)
-      .filter(id => selecionadosExcluir[id]);
+    const selecionados = Object.keys(selecionadosExcluir).filter(
+      (id) => selecionadosExcluir[id]
+    );
 
     if (selecionados.length === 0) {
       alert("Selecione ao menos uma atividade para excluir.");
@@ -452,7 +539,9 @@ export default function TelaMateria() {
   };
 
   const deletarSelecionados = async () => {
-    const ids = Object.keys(selecionadosExcluir).filter(id => selecionadosExcluir[id]);
+    const ids = Object.keys(selecionadosExcluir).filter(
+      (id) => selecionadosExcluir[id]
+    );
 
     if (ids.length === 0) {
       alert("Selecione algo para excluir.");
@@ -514,7 +603,12 @@ export default function TelaMateria() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "#0b4e91ff",
+      }}
+    >
       {/* Header */}
       <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
         <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
@@ -526,43 +620,57 @@ export default function TelaMateria() {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fff" />
-          <Text style={{ color: "#fff", marginTop: 10 }}>Carregando materiais...</Text>
+          <Text style={{ color: "#fff", marginTop: 10 }}>
+            Carregando materiais...
+          </Text>
         </View>
       ) : (
-        <ScrollView 
-          contentContainerStyle={{ padding: 10, flexGrow: 1, paddingBottom: 120 }}
+        <ScrollView
+          contentContainerStyle={{
+            padding: 10,
+            flexGrow: 1,
+            paddingBottom: 120,
+          }}
         >
           <Animatable.View animation="fadeInUp" duration={800} delay={100}>
             <View style={styles.mainContainer}>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <TouchableOpacity onPress={() => navigation.goBack()}> 
-                  <MaterialIcons name="arrow-back" size={30} color="black" /> 
-                </TouchableOpacity> 
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <MaterialIcons name="arrow-back" size={30} color="black" />
+                </TouchableOpacity>
 
-                <Text style={styles.containerTitle}>{materiaSelecionada}</Text> 
-                
-                {(isProfessor || isAdmin) && ( <View style={{ flexDirection: "row" }}> 
-                  <TouchableOpacity 
-                    onPress={handleEditHeaderPress}
-                    style={{ marginHorizontal: 5 }} 
-                  > 
-                    <MaterialIcons 
-                      name={modoEdicao ? "check" : "edit"} 
-                      size={28} 
-                      color="#0c4499" 
-                    /> 
-                  </TouchableOpacity> 
-                  <TouchableOpacity 
-                    onPress={handleDeleteHeaderPress}
-                    style={{ marginHorizontal: 5 }}
-                  > 
-                    <MaterialIcons 
-                      name={modoExclusao ? "check" : "delete"} 
-                      size={28} 
-                      color="#d32f2f" 
-                    /> 
-                  </TouchableOpacity> 
-                </View> )} 
+                <Text style={styles.containerTitle}>{materiaSelecionada}</Text>
+
+                {(isProfessor || isAdmin) && (
+                  <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                      onPress={handleEditHeaderPress}
+                      style={{ marginHorizontal: 5 }}
+                    >
+                      <MaterialIcons
+                        name={modoEdicao ? "check" : "edit"}
+                        size={28}
+                        color="#0c4499"
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleDeleteHeaderPress}
+                      style={{ marginHorizontal: 5 }}
+                    >
+                      <MaterialIcons
+                        name={modoExclusao ? "check" : "delete"}
+                        size={28}
+                        color="#d32f2f"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
 
               {Object.keys(materiasAgrupadas).length === 0 ? (
@@ -577,24 +685,53 @@ export default function TelaMateria() {
                     <View key={materiaTitulo} style={styles.temaContainer}>
                       {/* Header da matéria */}
                       <Text
-                        style={[styles.temaHeader, progressoMateria === 100 ? styles.temaHeaderConcluida : null]}
+                        style={[
+                          styles.temaHeader,
+                          progressoMateria === 100
+                            ? styles.temaHeaderConcluida
+                            : null,
+                        ]}
                         onPress={() => toggleMateria(materiaTitulo)} // CORRIGIDO
                       >
-                        <Text style={[styles.temaTitulo, progressoMateria === 100 && styles.textoConcluido]}>
+                        <Text
+                          style={[
+                            styles.temaTitulo,
+                            progressoMateria === 100 && styles.textoConcluido,
+                          ]}
+                        >
                           {materiaTitulo}
                         </Text>
                         <MaterialIcons
-                          name={expandedMaterias[materiaTitulo] ? "keyboard-arrow-up" : "keyboard-arrow-down"} // CORRIGIDO
+                          name={
+                            expandedMaterias[materiaTitulo]
+                              ? "keyboard-arrow-up"
+                              : "keyboard-arrow-down"
+                          } // CORRIGIDO
                           size={24}
                           color={progressoMateria === 100 ? "#2E7D32" : "black"}
                         />
                       </Text>
 
                       {/* Barra de progresso geral da matéria */}
-                      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-                        <Text style={{ width: 40, fontWeight: "bold" }}>{progressoMateria}%</Text>
-                        <View style={[styles.progressBarBackground, { flex: 1 }]}>
-                          <View style={[styles.progressBarFill, { width: `${progressoMateria}%` }]} />
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginTop: 5,
+                        }}
+                      >
+                        <Text style={{ width: 40, fontWeight: "bold" }}>
+                          {progressoMateria}%
+                        </Text>
+                        <View
+                          style={[styles.progressBarBackground, { flex: 1 }]}
+                        >
+                          <View
+                            style={[
+                              styles.progressBarFill,
+                              { width: `${progressoMateria}%` },
+                            ]}
+                          />
                         </View>
                       </View>
 
@@ -602,31 +739,66 @@ export default function TelaMateria() {
                       {expandedMaterias[materiaTitulo] &&
                         Object.keys(temas).map((tema) => {
                           const atividadesTema = temas[tema];
-                          const progressoTema = calcularProgresso(atividadesTema);
+                          const progressoTema =
+                            calcularProgresso(atividadesTema);
                           const temaKey = `${materiaTitulo}__${tema}`;
 
                           return (
-                            <View key={tema} style={[styles.temaContainer, { marginLeft: 0 }]}>
+                            <View
+                              key={tema}
+                              style={[styles.temaContainer, { marginLeft: 0 }]}
+                            >
                               <TouchableOpacity
-                                style={[styles.temaHeader, progressoTema === 100 && styles.temaHeaderConcluida]}
+                                style={[
+                                  styles.temaHeader,
+                                  progressoTema === 100 &&
+                                    styles.temaHeaderConcluida,
+                                ]}
                                 onPress={() => toggleTheme(temaKey)} // CORRETO
                               >
-                                <Text style={[styles.temaTitulo, progressoTema === 100 && styles.textoConcluido]}>
+                                <Text
+                                  style={[
+                                    styles.temaTitulo,
+                                    progressoTema === 100 &&
+                                      styles.textoConcluido,
+                                  ]}
+                                >
                                   {tema}
                                 </Text>
                                 <MaterialIcons
-                                  name={expandedThemes[tema] ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+                                  name={
+                                    expandedThemes[tema]
+                                      ? "keyboard-arrow-up"
+                                      : "keyboard-arrow-down"
+                                  }
                                   size={24}
                                   color="black"
                                 />
                               </TouchableOpacity>
 
-
                               {/* Barra de progresso do tema */}
-                              <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-                                <Text style={{ width: 40, fontWeight: "bold" }}>{progressoTema}%</Text>
-                                <View style={[styles.progressBarBackground, { flex: 1 }]}>
-                                  <View style={[styles.progressBarFill, { width: `${progressoTema}%` }]} />
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  marginTop: 5,
+                                }}
+                              >
+                                <Text style={{ width: 40, fontWeight: "bold" }}>
+                                  {progressoTema}%
+                                </Text>
+                                <View
+                                  style={[
+                                    styles.progressBarBackground,
+                                    { flex: 1 },
+                                  ]}
+                                >
+                                  <View
+                                    style={[
+                                      styles.progressBarFill,
+                                      { width: `${progressoTema}%` },
+                                    ]}
+                                  />
                                 </View>
                               </View>
 
@@ -634,15 +806,32 @@ export default function TelaMateria() {
                               {expandedThemes[temaKey] &&
                                 atividadesTema.map((item) => {
                                   const concluida = atividadeConcluida(item.id);
-                                  const isSelecionadoEdicao = !!selecionadosEdicao[item.id];
-                                  const isSelecionadoExcluir = !!selecionadosExcluir[item.id];
+                                  const isSelecionadoEdicao =
+                                    !!selecionadosEdicao[item.id];
+                                  const isSelecionadoExcluir =
+                                    !!selecionadosExcluir[item.id];
 
                                   return (
-                                    <View key={item.id} style={{ flexDirection: "row", alignItems: "center" }}>
+                                    <View
+                                      key={item.id}
+                                      style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                      }}
+                                    >
                                       {modoExclusao && (
-                                        <TouchableOpacity onPress={() => toggleSelecionado(item.id)} style={{ marginRight: 8 }}>
+                                        <TouchableOpacity
+                                          onPress={() =>
+                                            toggleSelecionado(item.id)
+                                          }
+                                          style={{ marginRight: 8 }}
+                                        >
                                           <MaterialIcons
-                                            name={isSelecionadoExcluir ? "check-box" : "check-box-outline-blank"}
+                                            name={
+                                              isSelecionadoExcluir
+                                                ? "check-box"
+                                                : "check-box-outline-blank"
+                                            }
                                             size={26}
                                             color="#333"
                                           />
@@ -650,9 +839,18 @@ export default function TelaMateria() {
                                       )}
 
                                       {modoEdicao === "selecionar" && (
-                                        <TouchableOpacity onPress={() => toggleSelecionadoEdicao(item.id)} style={{ marginRight: 8 }}>
+                                        <TouchableOpacity
+                                          onPress={() =>
+                                            toggleSelecionadoEdicao(item.id)
+                                          }
+                                          style={{ marginRight: 8 }}
+                                        >
                                           <MaterialIcons
-                                            name={isSelecionadoEdicao ? "check-box" : "check-box-outline-blank"}
+                                            name={
+                                              isSelecionadoEdicao
+                                                ? "check-box"
+                                                : "check-box-outline-blank"
+                                            }
                                             size={26}
                                             color="#0c4499"
                                           />
@@ -660,10 +858,20 @@ export default function TelaMateria() {
                                       )}
 
                                       <TouchableOpacity
-                                        style={[styles.cardActivity, concluida && styles.cardConcluida, { flex: 1 }]}
+                                        style={[
+                                          styles.cardActivity,
+                                          concluida && styles.cardConcluida,
+                                          { flex: 1 },
+                                        ]}
                                         onPress={() => {
-                                          if (modoExclusao) { toggleSelecionado(item.id); return; }
-                                          if (modoEdicao === "selecionar") { toggleSelecionadoEdicao(item.id); return; }
+                                          if (modoExclusao) {
+                                            toggleSelecionado(item.id);
+                                            return;
+                                          }
+                                          if (modoEdicao === "selecionar") {
+                                            toggleSelecionadoEdicao(item.id);
+                                            return;
+                                          }
 
                                           // comportamento normal: marca concluída e navega para tela do PDF
                                           marcarAtividadeConcluida(item);
@@ -677,7 +885,12 @@ export default function TelaMateria() {
                                           });
                                         }}
                                       >
-                                        <Text style={[styles.arquivo, concluida && styles.textoConcluido]}>
+                                        <Text
+                                          style={[
+                                            styles.arquivo,
+                                            concluida && styles.textoConcluido,
+                                          ]}
+                                        >
                                           {item.titulo}
                                         </Text>
                                       </TouchableOpacity>
@@ -698,70 +911,83 @@ export default function TelaMateria() {
 
       {/* Botão flutuante */}
       {(isProfessor || isAdmin) && (
-        <TouchableOpacity style={styles.floatingButton} onPress={() => setModalEnvioVisible(true)}>
-          <Text style={{ fontSize: 35, color: "#fff", marginBottom: 10 }}>+</Text>
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => setModalEnvioVisible(true)}
+        >
+          <Text style={{ fontSize: 35, color: "#fff", marginBottom: 10 }}>
+            +
+          </Text>
         </TouchableOpacity>
       )}
 
       {/* Modal de envio */}
       <Modal animationType="fade" transparent visible={modalEnvioVisible}>
-        <View style={styles.modalOverlay}> 
-          <View style={[styles.modalContainer, { zIndex: 2000 }]}> 
-            <View style={styles.modalHeader}> 
-              <Text style={styles.modalTitle}>Enviar material</Text> 
-              <TouchableOpacity onPress={() => setModalEnvioVisible(false)}> 
-                <MaterialIcons name="close" size={24} color="black" /> 
-              </TouchableOpacity> 
-            </View> 
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { zIndex: 2000 }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Enviar material</Text>
+              <TouchableOpacity onPress={() => setModalEnvioVisible(false)}>
+                <MaterialIcons name="close" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
 
-            <Text style={styles.label}>Matéria</Text> 
-            <DropDownPicker 
-              open={open} 
-              value={materiaSelecionada} 
-              items={materiasDisponiveis} 
-              setOpen={setOpen} 
-              setValue={setMateriaSelecionada} 
-              setItems={setMateriasDisponiveis} 
-              style={styles.input} 
+            <Text style={styles.label}>Matéria</Text>
+            <DropDownPicker
+              open={open}
+              value={materiaSelecionada}
+              items={materiasDisponiveis}
+              setOpen={setOpen}
+              setValue={setMateriaSelecionada}
+              setItems={setMateriasDisponiveis}
+              style={styles.input}
               zIndex={3000}
               zIndexInverse={1000}
-            /> 
+            />
 
-            <Text style={styles.label}>Tema</Text> 
-            <TextInput 
-              style={styles.input} 
-              value={tema} 
-              onChangeText={setTema} 
-              placeholder="Digite o tema" 
-            /> 
+            <Text style={styles.label}>Tema</Text>
+            <TextInput
+              style={styles.input}
+              value={tema}
+              onChangeText={setTema}
+              placeholder="Digite o tema"
+            />
 
-            <Text style={styles.label}>Subtema</Text> 
-            <TextInput 
-              style={styles.input} 
-              value={subtema} 
-              onChangeText={setSubtema} 
-              placeholder="Digite o Subtema" 
-            /> 
+            <Text style={styles.label}>Subtema</Text>
+            <TextInput
+              style={styles.input}
+              value={subtema}
+              onChangeText={setSubtema}
+              placeholder="Digite o Subtema"
+            />
 
-            <Text style={styles.label}>Título</Text> 
-            <TextInput 
-              style={styles.input} 
-              value={titulo} 
-              onChangeText={setTitulo} 
-              placeholder="Digite o título" 
-            /> 
+            <Text style={styles.label}>Título</Text>
+            <TextInput
+              style={styles.input}
+              value={titulo}
+              onChangeText={setTitulo}
+              placeholder="Digite o título"
+            />
 
-            <TouchableOpacity style={styles.fileButton} onPress={selecionarArquivo}> 
-              <Text style={{ color: "#fff" }}>{arquivoPdf?.name || "Adicionar arquivo"}</Text> 
-            </TouchableOpacity> 
+            <TouchableOpacity
+              style={styles.fileButton}
+              onPress={selecionarArquivo}
+            >
+              <Text style={{ color: "#fff" }}>
+                {arquivoPdf?.name || "Adicionar arquivo"}
+              </Text>
+            </TouchableOpacity>
 
-            <TouchableOpacity style={styles.sendButton} onPress={enviarOuAtualizarMaterial}>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={enviarOuAtualizarMaterial}
+            >
               <Text style={{ color: "#fff", fontWeight: "bold" }}>
                 {modoEdicao ? "Salvar" : "Enviar"}
               </Text>
             </TouchableOpacity>
-          </View> 
-        </View> 
+          </View>
+        </View>
       </Modal>
 
       {/* Modal de Edição */}
@@ -789,15 +1015,33 @@ export default function TelaMateria() {
             />
 
             <Text style={styles.label}>Tema</Text>
-            <TextInput style={styles.input} value={tema} onChangeText={setTema} placeholder="Digite o tema" />
+            <TextInput
+              style={styles.input}
+              value={tema}
+              onChangeText={setTema}
+              placeholder="Digite o tema"
+            />
 
             <Text style={styles.label}>Subtema</Text>
-            <TextInput style={styles.input} value={subtema} onChangeText={setSubtema} placeholder="Digite o subtema" />
+            <TextInput
+              style={styles.input}
+              value={subtema}
+              onChangeText={setSubtema}
+              placeholder="Digite o subtema"
+            />
 
             <Text style={styles.label}>Título</Text>
-            <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Digite o título" />
+            <TextInput
+              style={styles.input}
+              value={titulo}
+              onChangeText={setTitulo}
+              placeholder="Digite o título"
+            />
 
-            <TouchableOpacity style={styles.sendButton} onPress={atualizarMaterial}>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={atualizarMaterial}
+            >
               <Text style={{ color: "#fff", fontWeight: "bold" }}>Salvar</Text>
             </TouchableOpacity>
           </View>
@@ -813,7 +1057,6 @@ export default function TelaMateria() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalDeleteContainer}>
-            
             <Text style={styles.modalDeleteTitle}>Confirmar exclusão</Text>
 
             <Text style={styles.modalDeleteText}>
@@ -841,7 +1084,6 @@ export default function TelaMateria() {
                 </Text>
               </TouchableOpacity>
             </View>
-
           </View>
         </View>
       </Modal>
@@ -873,18 +1115,70 @@ export default function TelaMateria() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
+  header: {},
   botaoVoltar: { position: "absolute", top: 10 },
-  botao: { height: 40, width: 40, justifyContent: "center", alignItems: "center" },
-  userBadge: { position: "absolute", height: 20, width: 20, bottom: 0, left: 0, alignItems: "center", justifyContent: "center" },
-  userBadgeText: { fontWeight: "bold", color: "#FFF", fontSize: 8, top: 5, position: "absolute", alignSelf: "center" },
-  emptyText: { fontSize: 16, color: "#555", textAlign: "center", marginTop: 20 },
-  temaContainer: { marginBottom: 5, backgroundColor: "#fff", borderRadius: 12, padding: 10 },
-  temaHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10, borderRadius: 8, backgroundColor: "#f0f4ff", marginBottom: 5, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 3, elevation: 3, },
-  temaHeaderConcluida: { backgroundColor: "#C8E6C9", borderRadius: 8, padding: 10,},
+  botao: {
+    height: 40,
+    width: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  userBadge: {
+    position: "absolute",
+    height: 20,
+    width: 20,
+    bottom: 0,
+    left: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  userBadgeText: {
+    fontWeight: "bold",
+    color: "#FFF",
+    fontSize: 8,
+    top: 5,
+    position: "absolute",
+    alignSelf: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  temaContainer: {
+    marginBottom: 5,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 10,
+  },
+  temaHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#f0f4ff",
+    marginBottom: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  temaHeaderConcluida: {
+    backgroundColor: "#C8E6C9",
+    borderRadius: 8,
+    padding: 10,
+  },
   temaTitulo: { fontSize: 18, fontWeight: "bold", color: "#333" },
-  materiaTitulo: { fontSize: 20, fontWeight: "bold", color: "#0c4499", marginBottom: 5 },
-    cardActivity: {
+  materiaTitulo: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#0c4499",
+    marginBottom: 5,
+  },
+  cardActivity: {
     backgroundColor: "#f0f4ff",
     borderRadius: 10,
     padding: 14,
@@ -893,21 +1187,91 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   arquivo: { fontSize: 14, color: "#555", marginBottom: 5 },
-  progressBarBackground: { height: 6, backgroundColor: "#ddd", borderRadius: 3, marginTop: 5, marginBottom: 5, flex: 1 },
+  progressBarBackground: {
+    height: 6,
+    backgroundColor: "#ddd",
+    borderRadius: 3,
+    marginTop: 5,
+    marginBottom: 5,
+    flex: 1,
+  },
   progressBarFill: { height: 6, backgroundColor: "#4CAF50", borderRadius: 3 },
   cardConcluida: { backgroundColor: "#C8E6C9" },
   textoConcluido: { color: "#2E7D32", fontWeight: "bold" },
-  floatingButton: { position: "absolute", bottom: 100, right: 20, backgroundColor: "#0c4499", width: 60, height: 60, borderRadius: 30, justifyContent: "center", alignItems: "center", zIndex: 1000, elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5,borderWidth: 2, borderColor: "#fff", },
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
-  modalContainer: { width: "85%", backgroundColor: "#fff", borderRadius: 10, padding: 20 },
-  modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 15 },
+  floatingButton: {
+    position: "absolute",
+    bottom: 100,
+    right: 20,
+    backgroundColor: "#0c4499",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "85%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
   modalTitle: { fontSize: 18, fontWeight: "bold" },
   label: { marginTop: 10, marginBottom: 5, fontWeight: "bold" },
-  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 8, marginBottom: 10, zIndex: 1000 },
-  fileButton: { backgroundColor: "#8f8f8fff", borderRadius: 5, padding: 12, justifyContent: "center", alignItems: "center", marginBottom: 10 },
-  sendButton: { backgroundColor: "#0b4e91", borderRadius: 5, padding: 12, justifyContent: "center", alignItems: "center" },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 8,
+    marginBottom: 10,
+    zIndex: 1000,
+  },
+  fileButton: {
+    backgroundColor: "#8f8f8fff",
+    borderRadius: 5,
+    padding: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  sendButton: {
+    backgroundColor: "#0b4e91",
+    borderRadius: 5,
+    padding: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   imagehH1: { width: 220, height: 80, marginBottom: 10 },
-  menuBarContainer: { position: "absolute", bottom: 0, left: 0, right: 0, height: 70, borderTopWidth: 1, borderTopColor: "#ccc", zIndex: 1000, elevation: 10 },
+  menuBarContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    zIndex: 1000,
+    elevation: 10,
+  },
   mainContainer: {
     margin: 10,
     padding: 10,
@@ -915,7 +1279,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#ecececff",
     minHeight: Dimensions.get("window").height * 0.75,
   },
-  containerTitle: { fontSize: 28, marginLeft: 35, marginTop: 4, marginBottom: 10, fontWeight: "bold", color: "#000" },
+  containerTitle: {
+    fontSize: 28,
+    marginLeft: 35,
+    marginTop: 4,
+    marginBottom: 10,
+    fontWeight: "bold",
+    color: "#000",
+  },
   bolinhaContainer: {
     width: 20,
     alignItems: "center",
@@ -934,11 +1305,16 @@ const styles = StyleSheet.create({
 
   linhaVertical: {
     width: 2,
-    flex: 1,           // Faz a linha preencher verticalmente
+    flex: 1, // Faz a linha preencher verticalmente
     backgroundColor: "#000",
-    marginTop: 2,      // Espaço entre bolinha e linha
+    marginTop: 2, // Espaço entre bolinha e linha
   },
-  cardTitulo: { fontSize: 16, fontWeight: "bold", marginBottom: 4, color: "#333" },
+  cardTitulo: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+    color: "#333",
+  },
 
   modalXpOverlay: {
     flex: 1,
@@ -987,49 +1363,49 @@ const styles = StyleSheet.create({
   },
 
   modalDeleteContainer: {
-  width: "85%",
-  backgroundColor: "#fff",
-  padding: 20,
-  borderRadius: 20,
-  shadowColor: "#000",
-  shadowOpacity: 0.25,
-  shadowRadius: 10,
-  elevation: 10,
-},
+    width: "85%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 10,
+  },
 
-modalDeleteTitle: {
-  fontSize: 22,
-  fontWeight: "bold",
-  marginBottom: 10,
-  color: "#d32f2f",
-  textAlign: "center",
-},
+  modalDeleteTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#d32f2f",
+    textAlign: "center",
+  },
 
-modalDeleteText: {
-  fontSize: 16,
-  color: "#333",
-  textAlign: "center",
-  marginBottom: 20,
-},
+  modalDeleteText: {
+    fontSize: 16,
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 20,
+  },
 
-modalDeleteButtons: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  marginTop: 10,
-},
+  modalDeleteButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
 
-modalButton: {
-  flex: 1,
-  paddingVertical: 12,
-  marginHorizontal: 5,
-  borderRadius: 12,
-  justifyContent: "center",
-  alignItems: "center",
-},
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    marginHorizontal: 5,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 
-modalButtonText: {
-  fontSize: 16,
-  fontWeight: "bold",
-  color: "#000",
-},
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#000",
+  },
 });

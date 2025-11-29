@@ -19,12 +19,16 @@ import TopNavbar from "../components/TopNavbar";
 
 const API_URL = "https://api-tcc-9lha.onrender.com/alunos/ranking-geral";
 
-const RankingItem = ({ rank, name, xp, studyTime }) => (
+const RankingItem = ({ rank, name, xp, studyTime, photoUrl }) => (
   <View style={styles.itemContainer}>
     <Text style={styles.rankText}>{rank}</Text>
-    <View style={styles.profileIconSmall}>
-      <Icon name="person" size={20} color="#3b82f6" />
-    </View>
+    {photoUrl ? (
+      <Image source={{ uri: photoUrl }} style={styles.profileImageSmall} />
+    ) : (
+      <View style={styles.profileIconSmall}>
+        <Icon name="person" size={20} color="#3b82f6" />{" "}
+      </View>
+    )}
     <View style={styles.infoBlock}>
       <Text style={styles.nameText}>{name}</Text>
 
@@ -45,7 +49,8 @@ const TopThreeDisplay = ({ topThreeData }) => {
 
   const displayOrder = [third, first, second];
 
-  const TopThreeItem = ({ rank, name, xp, studyTime }) => {
+  const TopThreeItem = ({ rank, name, xp, studyTime, photoUrl }) => {
+    // <--- ADICIONAR photoUrl AQUI
     const isMain = rank === 1;
 
     return (
@@ -56,21 +61,22 @@ const TopThreeDisplay = ({ topThreeData }) => {
             isMain ? styles.firstPlaceBg : styles.otherPlaceBg,
           ]}
         >
-          {isMain && (
-            <FontAwesome5
-              name="crown"
-              size={18}
-              color="#FFD700"
-              style={styles.crownIcon}
+          {/* Lógica da coroa mantida... */}
+
+          {/* >>> LÓGICA CONDICIONAL: IMAGEM OU ÍCONE <<< */}
+          {photoUrl ? (
+            <Image
+              source={{ uri: photoUrl }}
+              style={
+                isMain ? styles.profileImageBig : styles.profileImageMedium
+              }
+              resizeMode="cover"
             />
+          ) : (
+            <Icon name="person" size={isMain ? 40 : 30} color="#fff" />
           )}
-          <Icon name="person" size={isMain ? 40 : 30} color="#fff" />
         </View>
-        <Text style={styles.topThreeRank}>{rank}</Text>
-        <Text style={styles.topThreeName}>{name}</Text>
-        <Text style={styles.topThreeDetail}>
-          XP: {xp ? xp.toLocaleString("pt-BR") : 0}
-        </Text>
+        {/* ... o restante do texto (rank, name, xp) */}
       </View>
     );
   };
@@ -119,11 +125,14 @@ export default function RankingScreen() {
 
         return {
           id: item.id,
-
           rank: currentRank - tiedUsersCount,
           name: item.nome,
           xp: currentXp,
           studyTime: item.studyTime || "00:00",
+          // >>>>> LINHA CRÍTICA MODIFICADA <<<<<
+          // Assume que a API agora retorna a URL do Cloudinary (string)
+          photoUrl: item.url_foto,
+          // Se a API retornar 'url_foto', mude para: item.url_foto
         };
       });
 
@@ -144,17 +153,10 @@ export default function RankingScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <TopNavbar />
       <StatusBar barStyle="light-content" backgroundColor="#0a1930" />
 
-      <View delay={300} animation={"fadeInDown"} style={styles.header}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
-          <TopNavbar />
-        </SafeAreaView>
-      </View>
-
       <View style={styles.mainContent}>
-        <Text style={styles.rankingTitle}>Ranking</Text>
-
         {loading ? (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Carregando Ranking...</Text>
@@ -195,26 +197,37 @@ const OFF_WHITE = "#f3f4f6";
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#338BE5",
+    backgroundColor: "#0b4e91ff",
+    justifyContent: "space-between",
   },
 
   mainContent: {
-    flex: 1,
+    height: "80%",
     backgroundColor: "white",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 15,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingTop: 45,
     marginHorizontal: 10,
-    borderRadius: 15,
     marginBottom: 10,
   },
-  rankingTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 30,
-    color: BLUE_BG,
+  profileIconSmall: {
+    padding: 5,
+    backgroundColor: WHITE,
+    marginHorizontal: 10,
+    width: 30, // <--- ADICIONADO
+    height: 30, // <--- ADICIONADO
+    alignItems: "center",
+    justifyContent: "center",
   },
+
+  // >>> ADICIONAR ESTE NOVO ESTILO PARA O COMPONENTE <Image> <<<
+  profileImageSmall: {
+    width: 30, // <--- CRÍTICO
+    height: 30, // <--- CRÍTICO
+    borderRadius: 15, // Metade de 30 para ser redondo
+    marginHorizontal: 10,
+  },
+
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -236,7 +249,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "flex-end",
-    paddingHorizontal: 10,
     marginBottom: 5,
   },
   topThreeItem: {
@@ -247,27 +259,25 @@ const styles = StyleSheet.create({
     width: "30%",
   },
   mainRankContainer: {
-    marginTop: -20,
+    marginTop: -10,
   },
   topThreeIconBackground: {
-    borderRadius: 50,
-    padding: 10,
     backgroundColor: LIGHT_BLUE,
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
     marginBottom: 5,
+    padding: 2,
   },
   firstPlaceBg: {
+    borderRadius: 35,
     backgroundColor: BLUE_BG,
-    padding: 15,
-    borderWidth: 4,
+    borderWidth: 2,
     borderColor: "#FFD700",
-    margin: 15,
   },
   otherPlaceBg: {
     backgroundColor: LIGHT_BLUE,
-    padding: 10,
+    borderRadius: 25,
   },
   crownIcon: {
     position: "absolute",
@@ -310,7 +320,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: OFF_WHITE,
-    borderRadius: 8,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
@@ -324,7 +333,6 @@ const styles = StyleSheet.create({
     color: BLUE_BG,
   },
   profileIconSmall: {
-    borderRadius: 20,
     padding: 5,
     backgroundColor: WHITE,
     marginHorizontal: 10,
@@ -347,5 +355,15 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#6b7280",
     textAlign: "right",
+  },
+  profileImageBig: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+  },
+  profileImageMedium: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
 });

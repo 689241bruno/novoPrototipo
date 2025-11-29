@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import UsuarioService from "../services/UsuarioService"; 
+import UsuarioService from "../services/UsuarioService";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TopNavbar() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [usuario, setUsuario] = useState(null);
 
@@ -38,18 +40,19 @@ export default function TopNavbar() {
     if (typeof foto === "string") {
       if (
         foto.startsWith("data:image") || // Base64
-        foto.startsWith("http") ||       // URL
-        foto.startsWith("/")             // Caminho local
-      ) return { uri: foto };
+        foto.startsWith("http") || // URL
+        foto.startsWith("/") // Caminho local
+      )
+        return { uri: foto };
     }
     return require("../assets/user.png");
   };
 
-  const foto = getFotoSource(usuario?.foto);
+  const foto = getFotoSource(usuario?.url_foto);
   const corAvatar = usuario?.cor || "#ffffffff";
 
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top }]}>
       {/* Ícone esquerdo - Home */}
       <Pressable
         style={styles.iconButton}
@@ -64,7 +67,10 @@ export default function TopNavbar() {
 
       {/* Ícone direito - Perfil */}
       <Pressable
-        style={[styles.iconButton, { backgroundColor: corAvatar, borderRadius: 50 }]}
+        style={[
+          styles.iconButton,
+          { backgroundColor: corAvatar, borderRadius: 50 },
+        ]}
         onPress={() => navigation.navigate("PerfilUsuario")}
       >
         <Image

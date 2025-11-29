@@ -12,7 +12,7 @@ import {
   Modal,
   Dimensions,
   Switch,
-  Animated, 
+  Animated,
   Easing,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
@@ -43,11 +43,7 @@ const FlashcardItem = ({ item, aberto, onToggle, openEdit, onDelete }) => {
 
   return (
     <Animated.View
-      style={[
-        styles.card,
-        { height: animHeight },
-        aberto && styles.cardAberto,
-      ]}
+      style={[styles.card, { height: animHeight }, aberto && styles.cardAberto]}
     >
       <TouchableOpacity
         activeOpacity={0.9}
@@ -125,20 +121,22 @@ export default function FlashcardsMateria({ route, navigation }) {
   const [abertoId, setAbertoId] = useState(null);
 
   const { height, width } = Dimensions.get("window");
-  const larguraCard = (width - 15 * 3) / 2
-  const alturaCardFechado = height * 0.2; 
-  const alturaCardAberto = height * 0.5; 
+  const larguraCard = (width - 15 * 3) / 2;
+  const alturaCardFechado = height * 0.2;
+  const alturaCardAberto = height * 0.5;
 
   const [flashcardToEdit, setFlashcardToEdit] = useState(null);
-  const [editFlashcardModalVisible, setEditFlashcardModalVisible] = useState(false);
-  const [deleteFlashcardModalVisible, setDeleteFlashcardModalVisible] = useState(false);
+  const [editFlashcardModalVisible, setEditFlashcardModalVisible] =
+    useState(false);
+  const [deleteFlashcardModalVisible, setDeleteFlashcardModalVisible] =
+    useState(false);
 
   // Carregar flashcards e modo intensivo do aluno
   useEffect(() => {
     async function carregarDados() {
       try {
         console.log("Iniciando carregamento...");
-        
+
         // Obter usuário logado
         const usuarioId = await FlashcardService.getUsuarioId();
         console.log("UsuarioId retornado:", usuarioId);
@@ -159,13 +157,14 @@ export default function FlashcardsMateria({ route, navigation }) {
         }
 
         // Buscar flashcards do usuário
-        const flashcardsData = await FlashcardService.listarFlashcards(usuarioId);
+        const flashcardsData = await FlashcardService.listarFlashcards(
+          usuarioId
+        );
 
         // Filtrar por matéria
         const filtrados = flashcardsData.filter((fc) => fc.materia === materia);
         setFlashcards(filtrados);
       } catch (err) {
-
         console.error("Erro ao carregar dados:", err);
         console.log("URL com erro:", err.response?.config?.url);
         console.log("Status do erro:", err.response?.status);
@@ -367,7 +366,13 @@ export default function FlashcardsMateria({ route, navigation }) {
         </SafeAreaView>
       </Animatable.View>
       <View style={styles.whiteContainer}>
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <MaterialIcons name="arrow-back" size={28} color="black" />
           </TouchableOpacity>
@@ -470,7 +475,10 @@ export default function FlashcardsMateria({ route, navigation }) {
               />
             </View>
 
-            <TouchableOpacity style={styles.sendButton} onPress={criarFlashcard}>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={criarFlashcard}
+            >
               <Text style={{ color: "#fff", fontWeight: "bold" }}>Salvar</Text>
             </TouchableOpacity>
           </View>
@@ -488,7 +496,9 @@ export default function FlashcardsMateria({ route, navigation }) {
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Editar Flashcard</Text>
-              <TouchableOpacity onPress={() => setEditFlashcardModalVisible(false)}>
+              <TouchableOpacity
+                onPress={() => setEditFlashcardModalVisible(false)}
+              >
                 <MaterialIcons name="close" size={24} color="black" />
               </TouchableOpacity>
             </View>
@@ -497,14 +507,18 @@ export default function FlashcardsMateria({ route, navigation }) {
             <TextInput
               style={styles.input}
               value={flashcardToEdit?.pergunta || ""}
-              onChangeText={(t) => setFlashcardToEdit(prev => ({ ...prev, pergunta: t }))}
+              onChangeText={(t) =>
+                setFlashcardToEdit((prev) => ({ ...prev, pergunta: t }))
+              }
             />
 
             <Text style={styles.label}>Resposta</Text>
             <TextInput
               style={[styles.input, { height: 80 }]}
               value={flashcardToEdit?.resposta || ""}
-              onChangeText={(t) => setFlashcardToEdit(prev => ({ ...prev, resposta: t }))}
+              onChangeText={(t) =>
+                setFlashcardToEdit((prev) => ({ ...prev, resposta: t }))
+              }
               multiline
             />
 
@@ -512,12 +526,22 @@ export default function FlashcardsMateria({ route, navigation }) {
             <TextInput
               style={styles.input}
               value={String(flashcardToEdit?.repeticoes || 4)}
-              onChangeText={(t) => setFlashcardToEdit(prev => ({ ...prev, repeticoes: parseInt(t) || 4 }))}
+              onChangeText={(t) =>
+                setFlashcardToEdit((prev) => ({
+                  ...prev,
+                  repeticoes: parseInt(t) || 4,
+                }))
+              }
               keyboardType="numeric"
             />
 
-            <TouchableOpacity style={styles.sendButton} onPress={handleUpdateFlashcard}>
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>Salvar alterações</Text>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={handleUpdateFlashcard}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                Salvar alterações
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -534,9 +558,19 @@ export default function FlashcardsMateria({ route, navigation }) {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Excluir flashcard?</Text>
             <Text style={{ color: "#475569", marginTop: 6 }}>
-              Esta ação é <Text style={{ color: "#c62828", fontWeight: "700" }}>irreversível</Text> e removerá o flashcard.
+              Esta ação é{" "}
+              <Text style={{ color: "#c62828", fontWeight: "700" }}>
+                irreversível
+              </Text>{" "}
+              e removerá o flashcard.
             </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 16 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 16,
+              }}
+            >
               <TouchableOpacity
                 onPress={() => setDeleteFlashcardModalVisible(false)}
                 style={[styles.sendButton, { backgroundColor: "#9e9e9e" }]}
@@ -563,7 +597,14 @@ export default function FlashcardsMateria({ route, navigation }) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#0b4e91ff" },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    elevation: 4,
+    marginBottom: 10,
+  },
   whiteContainer: {
     flex: 1,
     backgroundColor: "#ececec",
@@ -590,7 +631,12 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "#fff", fontWeight: "bold" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  emptyText: { color: "#333", fontSize: 16, marginTop: 20, textAlign: "center" },
+  emptyText: {
+    color: "#333",
+    fontSize: 16,
+    marginTop: 20,
+    textAlign: "center",
+  },
   floatingButton: {
     position: "absolute",
     bottom: 120,

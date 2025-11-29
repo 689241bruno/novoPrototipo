@@ -15,39 +15,34 @@ import TopNavbar from "../components/TopNavbar";
 
 export default function FlashcardsScreen({ navigation }) {
   const materias = [
-    { 
-      nome: "Linguagens", 
+    {
+      nome: "Linguagens",
       icone: require("../assets/pilha-de-livros.png"),
-      descricao: "Português, Literatura, Inglês e Artes."
+      descricao: "Português, Literatura, Inglês e Artes.",
     },
-    { 
-      nome: "Exatas", 
+    {
+      nome: "Exatas",
       icone: require("../assets/matematica.png"),
-      descricao: "Álgebra, Geometria, Estatística e Funções."
+      descricao: "Álgebra, Geometria, Estatística e Funções.",
     },
-    { 
-      nome: "Ciências da Natureza", 
+    {
+      nome: "Ciências da Natureza",
       icone: require("../assets/ambiental.png"),
-      descricao: "Física, Química e Biologia."
+      descricao: "Física, Química e Biologia.",
     },
-    { 
-      nome: "Ciências Humanas", 
+    {
+      nome: "Ciências Humanas",
       icone: require("../assets/livro-de-historia.png"),
-      descricao: "História, Geografia, Filosofia e Sociologia."
+      descricao: "História, Geografia, Filosofia e Sociologia.",
     },
   ];
 
   const { width } = Dimensions.get("window");
-  const cardWidth = width * 0.85; 
+  const cardWidth = width * 0.85;
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
-      <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
-          <TopNavbar />
-        </SafeAreaView>
-      </Animatable.View>
+      <TopNavbar />
 
       {/* Container branco centralizado */}
       <Animatable.View
@@ -71,13 +66,15 @@ export default function FlashcardsScreen({ navigation }) {
                 activeOpacity={0.9}
                 style={[styles.card, { width: cardWidth }]}
                 onPress={() =>
-                  navigation.navigate("FlashcardsMateria", { materia: item.nome })
+                  navigation.navigate("FlashcardsMateria", {
+                    materia: item.nome,
+                  })
                 }
               >
                 <View style={styles.imageContainer}>
                   <Image source={item.icone} style={styles.icone} />
                 </View>
-                
+
                 <View style={styles.textContainer}>
                   <Text style={styles.texto}>{item.nome}</Text>
                   <Text style={styles.descricao}>{item.descricao}</Text>
@@ -101,14 +98,11 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#0b4e91ff",
+    justifyContent: "space-between",
   },
-  header: {
-    backgroundColor: "#fff",
-    elevation: 4,
-    marginBottom: 10,
-  },
+
   whiteContainer: {
-    flex: 1,
+    height: "80%",
     margin: 20,
     backgroundColor: "#ececec",
     borderRadius: 15,
