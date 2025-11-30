@@ -13,7 +13,7 @@ const imagens = {
 
 export default function MenuBar() {
   const navigation = useNavigation();
-  const insets = useNavigation();
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
@@ -87,12 +87,11 @@ export default function MenuBar() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 90,
+    height: 120,
     width: "100%",
     backgroundColor: "#eef9ffff",
     position: "absolute",
     bottom: 0,
-    elevation: 5,
   },
   nav: {
     height: "100%",

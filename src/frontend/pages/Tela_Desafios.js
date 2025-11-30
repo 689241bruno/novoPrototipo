@@ -123,8 +123,9 @@ const styles = StyleSheet.create({
 
   whiteContainer: {
     flex: 1,
-    backgroundColor: "#ececec",
     margin: 10,
+    backgroundColor: "#ececec",
+    marginTop: 50,
     borderRadius: 15,
     padding: 12,
   },

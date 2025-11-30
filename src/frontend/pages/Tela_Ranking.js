@@ -219,9 +219,9 @@ const styles = StyleSheet.create({
   },
 
   profileImageSmall: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginHorizontal: 10,
   },
 
@@ -353,16 +353,16 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   profileImageBig: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     borderWidth: 4,
     borderColor: "#ffe23dff",
   },
   profileImageMedium: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     borderWidth: 2,
     borderColor: "#bdbdbdff",
   },
