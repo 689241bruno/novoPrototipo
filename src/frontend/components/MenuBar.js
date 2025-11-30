@@ -16,9 +16,8 @@ export default function MenuBar() {
   const insets = useNavigation();
 
   return (
-    <View style={[styles.container, { padding: insets.bottom }]}>
+    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <View style={styles.nav}>
-        {/* Lado esquerdo */}
         <View style={styles.section}>
           <TouchableOpacity
             style={styles.botao}

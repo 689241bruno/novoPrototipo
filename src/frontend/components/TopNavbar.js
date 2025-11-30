@@ -52,7 +52,7 @@ export default function TopNavbar() {
   const corAvatar = usuario?.cor || "#ffffffff";
 
   return (
-    <View style={[styles.header, { height: "10%", paddingTop: insets.top }]}>
+    <View style={[styles.header, { height: 125, paddingTop: insets.top }]}>
       {/* Ícone esquerdo - Home */}
       <Pressable
         style={styles.iconButton}

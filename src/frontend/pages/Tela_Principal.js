@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   main: {
     padding: 20,
-    paddingTop: 20,
+    marginTop: 20,
     marginBottom: 60,
     display: "flex",
     flexDirection: "column",

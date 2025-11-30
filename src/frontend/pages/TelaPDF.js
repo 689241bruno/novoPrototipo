@@ -103,16 +103,7 @@ export default function Atividade() {
 
   return (
     <View style={styles.container}>
-      {/* Navbar superior */}
-      <Animatable.View
-        delay={300}
-        animation={"fadeInDown"}
-        style={styles.header}
-      >
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
-          <TopNavbar />
-        </SafeAreaView>
-      </Animatable.View>
+      <TopNavbar />
 
       <View
         style={{
@@ -158,15 +149,7 @@ export default function Atividade() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f2f6ff" },
-  header: {
-    width: "100%",
-    height: 80,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    elevation: 5,
-  },
+
   rightIcons: { flexDirection: "row", alignItems: "center" },
   botao: {
     width: 40,

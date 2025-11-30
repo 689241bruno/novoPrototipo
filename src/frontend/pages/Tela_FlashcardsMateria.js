@@ -359,12 +359,7 @@ export default function FlashcardsMateria({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
-      <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
-          <TopNavbar />
-        </SafeAreaView>
-      </Animatable.View>
+      <TopNavbar />
       <View style={styles.whiteContainer}>
         <View
           style={{
@@ -597,14 +592,7 @@ export default function FlashcardsMateria({ route, navigation }) {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#0b4e91ff" },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    elevation: 4,
-    marginBottom: 10,
-  },
+
   whiteContainer: {
     flex: 1,
     backgroundColor: "#ececec",

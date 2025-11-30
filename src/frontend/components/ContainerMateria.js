@@ -44,7 +44,7 @@ export default function ContainerMateria(props) {
         <Progress.Bar
           progress={props.progress}
           height={15}
-          width={250}
+          width={270}
           color="green"
           style={styles.progressBarStyle}
           animationType="spring"

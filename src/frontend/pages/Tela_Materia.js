@@ -93,7 +93,7 @@ export default function TelaMateria() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      setLoading(true); // inicia o loading
+      setLoading(true);
       try {
         const email = await UsuarioService.getLoggedInUserEmail();
         const responseCheck = await UsuarioService.checkUser(email);
@@ -610,11 +610,7 @@ export default function TelaMateria() {
       }}
     >
       {/* Header */}
-      <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
-        <SafeAreaView style={{ backgroundColor: "#0b4e91ff" }}>
-          <TopNavbar />
-        </SafeAreaView>
-      </Animatable.View>
+      <TopNavbar />
 
       {/* ScrollView com materiais */}
       {loading ? (
@@ -1281,13 +1277,12 @@ const styles = StyleSheet.create({
   },
   containerTitle: {
     fontSize: 28,
-    marginLeft: 35,
     marginTop: 4,
     marginBottom: 10,
+    flex: 1,
     fontWeight: "bold",
     color: "#000",
-    backgroundColor: "red",
-    alignSelf: "center",
+    textAlign: "center",
   },
   bolinhaContainer: {
     width: 20,
@@ -1349,6 +1344,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0b4e91",
+    marginTop: 40,
   },
 
   eleteModalBox: {
