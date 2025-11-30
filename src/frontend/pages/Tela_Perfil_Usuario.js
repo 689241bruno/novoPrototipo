@@ -359,12 +359,8 @@ export default function PerfilScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
-      <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
-        <TopNavbar />
-      </Animatable.View>
+      <TopNavbar />
 
-      {/* Conteúdo principal */}
       <Animatable.View
         delay={300}
         animation="fadeInUp"
