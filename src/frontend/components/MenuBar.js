@@ -1,6 +1,7 @@
 import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const imagens = {
   PlanoEstudos: require("../assets/PlanoEstudos_Icon.png"),
@@ -12,9 +13,10 @@ const imagens = {
 
 export default function MenuBar() {
   const navigation = useNavigation();
+  const insets = useNavigation();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { padding: insets.bottom }]}>
       <View style={styles.nav}>
         {/* Lado esquerdo */}
         <View style={styles.section}>

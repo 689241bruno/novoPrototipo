@@ -14,7 +14,7 @@ import * as Animatable from "react-native-animatable";
 import MenuBar from "../components/MenuBar";
 import TopNavbar from "../components/TopNavbar";
 import UsuarioService from "../services/UsuarioService";
-import MaterialService from '../services/MaterialService';
+import MaterialService from "../services/MaterialService";
 import Constants from "expo-constants";
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -35,21 +35,35 @@ export default function Home() {
     "Ciencias Humanas": "Ciências Humanas",
   };
 
-  const calcularProgressoPorMateria = (materiaNome, materiais, progressoUsuario) => {
+  const calcularProgressoPorMateria = (
+    materiaNome,
+    materiais,
+    progressoUsuario
+  ) => {
     materiais = Array.isArray(materiais) ? materiais : [];
     progressoUsuario = Array.isArray(progressoUsuario) ? progressoUsuario : [];
 
     const materiaPadronizada = materiasMap[materiaNome] || materiaNome;
 
     const totalAtividades = materiais.filter(
-      m => String(m.materia).normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
-           String(materiaPadronizada).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      (m) =>
+        String(m.materia)
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") ===
+        String(materiaPadronizada)
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
     ).length;
 
     const concluidas = progressoUsuario.filter(
-      p => String(p.materia).normalize("NFD").replace(/[\u0300-\u036f]/g, "") ===
-           String(materiaPadronizada).normalize("NFD").replace(/[\u0300-\u036f]/g, "") &&
-           (p.concluida === 1 || p.concluida === true || p.status === "concluida")
+      (p) =>
+        String(p.materia)
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") ===
+          String(materiaPadronizada)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") &&
+        (p.concluida === 1 || p.concluida === true || p.status === "concluida")
     ).length;
 
     const progresso = totalAtividades > 0 ? concluidas / totalAtividades : 0;
@@ -70,9 +84,15 @@ export default function Home() {
       const progressoMateria = {};
 
       await Promise.all(
-        Object.keys(materiasMap).map(async materia => {
-          const materiaisMateria = (await MaterialService.listarMaterias(materiasMap[materia], id)).data;
-          progressoMateria[materia] = calcularProgressoPorMateria(materia, materiaisMateria, progressoData.data);
+        Object.keys(materiasMap).map(async (materia) => {
+          const materiaisMateria = (
+            await MaterialService.listarMaterias(materiasMap[materia], id)
+          ).data;
+          progressoMateria[materia] = calcularProgressoPorMateria(
+            materia,
+            materiaisMateria,
+            progressoData.data
+          );
         })
       );
 
@@ -93,20 +113,27 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animatable.View delay={300} animation={"fadeInDown"} style={styles.header}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
-          <TopNavbar />
-        </SafeAreaView>
-      </Animatable.View>
+      <TopNavbar />
 
       <ScrollView style={styles.main}>
         {loading ? (
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: 50 }}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 50,
+            }}
+          >
             <ActivityIndicator size="large" color="#fff" />
           </View>
         ) : (
           <>
-            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Linguagens" })}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("Materia", { materia: "Linguagens" })
+              }
+            >
               <ContainerMateria
                 titulo="Linguagens"
                 nomeImage="Linguagens"
@@ -114,7 +141,11 @@ export default function Home() {
                 delayanim={400}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Matematica" })}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("Materia", { materia: "Matematica" })
+              }
+            >
               <ContainerMateria
                 titulo="Matemática"
                 nomeImage="Matemática"
@@ -122,7 +153,13 @@ export default function Home() {
                 delayanim={480}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Ciencias da Natureza" })}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("Materia", {
+                  materia: "Ciencias da Natureza",
+                })
+              }
+            >
               <ContainerMateria
                 titulo="Ciências da Natureza"
                 nomeImage="CiênciasdaNatureza"
@@ -130,7 +167,11 @@ export default function Home() {
                 delayanim={560}
               />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("Materia", { materia: "Ciencias Humanas" })}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("Materia", { materia: "Ciencias Humanas" })
+              }
+            >
               <ContainerMateria
                 titulo="Ciências Humanas"
                 nomeImage="CiênciasHumanas"
@@ -138,7 +179,11 @@ export default function Home() {
                 delayanim={640}
               />
             </Pressable>
-            <ContainerMateria titulo="Redação" progress={0.4} nomeImage="Redação" />
+            <ContainerMateria
+              titulo="Redação"
+              progress={0.4}
+              nomeImage="Redação"
+            />
             <View style={styles.footer}></View>
           </>
         )}
@@ -151,7 +196,19 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0b4e91" },
-  header: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#fff", elevation: 4, marginBottom: 10 },
-  main: { padding: 20, paddingTop: 20, marginBottom: 60, display: "flex", flexDirection: "column" },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    elevation: 4,
+    marginBottom: 10,
+  },
+  main: {
+    padding: 20,
+    paddingTop: 20,
+    marginBottom: 60,
+    display: "flex",
+    flexDirection: "column",
+  },
   footer: { height: 90 },
 });

@@ -52,7 +52,7 @@ export default function TopNavbar() {
   const corAvatar = usuario?.cor || "#ffffffff";
 
   return (
-    <View style={[styles.header, { paddingTop: insets.top }]}>
+    <View style={[styles.header, { height: "10%", paddingTop: insets.top }]}>
       {/* Ícone esquerdo - Home */}
       <Pressable
         style={styles.iconButton}
@@ -69,7 +69,10 @@ export default function TopNavbar() {
       <Pressable
         style={[
           styles.iconButton,
-          { backgroundColor: corAvatar, borderRadius: 50 },
+          {
+            borderRadius: 50,
+            alignItems: "center",
+          },
         ]}
         onPress={() => navigation.navigate("PerfilUsuario")}
       >
@@ -93,7 +96,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 10,
-    paddingVertical: 5,
     elevation: 4,
     backgroundColor: "#eef9ffff",
   },
@@ -104,8 +106,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
-    height: "80%",
-    width: "80%",
+    height: "90%",
+    width: "90%",
   },
   badgeContainer: {
     position: "absolute",

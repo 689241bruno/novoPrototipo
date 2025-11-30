@@ -50,7 +50,6 @@ const TopThreeDisplay = ({ topThreeData }) => {
   const displayOrder = [third, first, second];
 
   const TopThreeItem = ({ rank, name, xp, studyTime, photoUrl }) => {
-    // <--- ADICIONAR photoUrl AQUI
     const isMain = rank === 1;
 
     return (
@@ -61,9 +60,6 @@ const TopThreeDisplay = ({ topThreeData }) => {
             isMain ? styles.firstPlaceBg : styles.otherPlaceBg,
           ]}
         >
-          {/* Lógica da coroa mantida... */}
-
-          {/* >>> LÓGICA CONDICIONAL: IMAGEM OU ÍCONE <<< */}
           {photoUrl ? (
             <Image
               source={{ uri: photoUrl }}
@@ -75,8 +71,12 @@ const TopThreeDisplay = ({ topThreeData }) => {
           ) : (
             <Icon name="person" size={isMain ? 40 : 30} color="#fff" />
           )}
+          <Text style={styles.topThreeRank}>{rank}°</Text>
+          <Text style={styles.topThreeName}>{name}</Text>
+          <Text style={styles.topThreeDetail}>
+            XP: {xp ? xp.toLocaleString("pt-BR") : 0}
+          </Text>
         </View>
-        {/* ... o restante do texto (rank, name, xp) */}
       </View>
     );
   };
@@ -129,10 +129,8 @@ export default function RankingScreen() {
           name: item.nome,
           xp: currentXp,
           studyTime: item.studyTime || "00:00",
-          // >>>>> LINHA CRÍTICA MODIFICADA <<<<<
-          // Assume que a API agora retorna a URL do Cloudinary (string)
+
           photoUrl: item.url_foto,
-          // Se a API retornar 'url_foto', mude para: item.url_foto
         };
       });
 
@@ -214,17 +212,16 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: WHITE,
     marginHorizontal: 10,
-    width: 30, // <--- ADICIONADO
-    height: 30, // <--- ADICIONADO
+    width: 30,
+    height: 30,
     alignItems: "center",
     justifyContent: "center",
   },
 
-  // >>> ADICIONAR ESTE NOVO ESTILO PARA O COMPONENTE <Image> <<<
   profileImageSmall: {
-    width: 30, // <--- CRÍTICO
-    height: 30, // <--- CRÍTICO
-    borderRadius: 15, // Metade de 30 para ser redondo
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     marginHorizontal: 10,
   },
 
@@ -270,14 +267,13 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   firstPlaceBg: {
-    borderRadius: 35,
-    backgroundColor: BLUE_BG,
-    borderWidth: 2,
-    borderColor: "#FFD700",
+    borderRadius: 40,
+    backgroundColor: "white",
+    padding: 7,
   },
   otherPlaceBg: {
-    backgroundColor: LIGHT_BLUE,
-    borderRadius: 25,
+    borderRadius: 35,
+    backgroundColor: "white",
   },
   crownIcon: {
     position: "absolute",
@@ -360,10 +356,14 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
+    borderWidth: 4,
+    borderColor: "#ffe23dff",
   },
   profileImageMedium: {
     width: 50,
     height: 50,
     borderRadius: 25,
+    borderWidth: 2,
+    borderColor: "#bdbdbdff",
   },
 });

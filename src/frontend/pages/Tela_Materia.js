@@ -611,7 +611,7 @@ export default function TelaMateria() {
     >
       {/* Header */}
       <Animatable.View delay={300} animation="fadeInDown" style={styles.header}>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#0b4e91ff" }}>
+        <SafeAreaView style={{ backgroundColor: "#0b4e91ff" }}>
           <TopNavbar />
         </SafeAreaView>
       </Animatable.View>
@@ -1268,7 +1268,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: 70,
     borderTopWidth: 1,
-    borderTopColor: "#ccc",
+    borderTopColor: "#fc1f1fff",
     zIndex: 1000,
     elevation: 10,
   },
@@ -1286,6 +1286,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: "bold",
     color: "#000",
+    backgroundColor: "red",
+    alignSelf: "center",
   },
   bolinhaContainer: {
     width: 20,
